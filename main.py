@@ -30,7 +30,6 @@ except ImportError as e:
         JAVA_FOUND = False
     else:
         sys.excepthook(*sys.exc_info())
-
 from PySide6.QtCore import QSize, QTranslator, QLocale, QTimer, Signal
 from PySide6.QtGui import QIcon, QFontDatabase
 from PySide6.QtWidgets import QMainWindow, QApplication
@@ -208,9 +207,9 @@ class ModLoader(QMainWindow):
             self.controllerGetterTimer.timeout.connect(self.controllerHandler)
             self.controllerGetterTimer.start(10)
         else:
-            message = ("Java not found!\n\nRecommended java: "
-                       "<url=\"https://libericajdk.ru/pages/downloads/#/java-8-lts\">"
-                       "https://libericajdk.ru/pages/downloads/#/java-8-lts</url>")
+            message = ("Java not found!\n\nPlease Install <u><b>The Windows Offline (64-bit)</b></u> Version:\n"
+                       "<url=\"https://www.java.com/en/download/windows_manual.jsp\">"
+                       "https://www.java.com/en/download/windows_manual.jsp</url>")
             self.showError("Fatal Error:", TextFormatter.format(message, 11), terminate=True)
 
         InitWindowClose()
