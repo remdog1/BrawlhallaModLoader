@@ -1,7 +1,5 @@
 import re
 import sys
-import json
-import urllib.request
 
 GAMEBANANA = "https://gamebanana.com/tools/7444"
 
@@ -71,35 +69,4 @@ def _getLatest(latest):
 
 
 def GetLatest():
-    if GIT_VERSION is None:
-        return None
-
-    try:
-        resp = urllib.request.urlopen(f"{GITHUB_API}/repos/{REPO}/releases")
-        json_payload = json.loads(resp.read().decode("UTF-8"))
-    except:
-        return None
-
-    if json_payload:
-        latest = json_payload[0]
-
-        if latest.get("prerelease", False):
-            if PRERELEASE:
-                tag_name = latest.get("tag_name", None)
-                if tag_name is not None and tag_name != GIT_VERSION:
-                    return _getLatest(latest)
-                else:
-                    return None
-            else:
-                for release in json_payload:
-                    if not release.get("prerelease", False):
-                        latest = release
-                        break
-                else:
-                    return None
-
-        tag_name = latest.get("tag_name", None)
-        if tag_name is not None and tag_name != GIT_VERSION:
-            return _getLatest(latest)
-        else:
-            return None
+    return None

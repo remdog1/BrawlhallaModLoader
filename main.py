@@ -1,14 +1,8 @@
 import os
 import sys
 import time
-import py7zr
-import urllib
-import rarfile
-import zipfile
-import traceback
 import threading
 import webbrowser
-import subprocess
 import multiprocessing
 
 # (https://stackoverflow.com/questions/9144724/unknown-encoding-idna-in-python-requests)
@@ -30,6 +24,7 @@ except ImportError as e:
         JAVA_FOUND = False
     else:
         sys.excepthook(*sys.exc_info())
+
 from PySide6.QtCore import QSize, QTranslator, QLocale, QTimer, Signal
 from PySide6.QtGui import QIcon, QFontDatabase
 from PySide6.QtWidgets import QMainWindow, QApplication
@@ -52,7 +47,7 @@ import ui.ui_sources.translate as translate
 
 SUPPORT_URL = "https://www.patreon.com/bhmodloader"
 
-PROGRAM_NAME = "Brawlhalla ModLoader"
+PROGRAM_NAME = "Brawlhalla ModLoader + Sound"
 
 
 def InitWindowSetText(text):
@@ -76,8 +71,12 @@ def InitWindowClose():
 
 def TerminateApp(exitId=0):
     for proc in multiprocessing.active_children():
-        proc.kill()
-    os.kill(multiprocessing.current_process().pid, exitId)
+        try:
+            proc.kill()
+        except:
+            pass
+    # Don't use os.kill as it causes invalid handle errors when Qt is cleaning up
+    # Instead, just let sys.exit do its job
     sys.exit(exitId)
 
 
@@ -207,9 +206,9 @@ class ModLoader(QMainWindow):
             self.controllerGetterTimer.timeout.connect(self.controllerHandler)
             self.controllerGetterTimer.start(10)
         else:
-            message = ("Java not found!\n\nPlease Install <u><b>The Windows Offline (64-bit)</b></u> Version:\n"
-                       "<url=\"https://www.java.com/en/download/windows_manual.jsp\">"
-                       "https://www.java.com/en/download/windows_manual.jsp</url>")
+            message = ("Java not found!\n\nRecommended java: "
+                       "<url=\"https://libericajdk.ru/pages/downloads/#/java-8-lts\">"
+                       "https://libericajdk.ru/pages/downloads/#/java-8-lts</url>")
             self.showError("Fatal Error:", TextFormatter.format(message, 11), terminate=True)
 
         InitWindowClose()
@@ -596,20 +595,7 @@ class ModLoader(QMainWindow):
             QApplication.processEvents()
 
     def updateApp(self, fileUrl: str, version: str):
-        filePath = os.path.join(os.getcwd(), "temp.exe")
-        fileName = os.path.split(fileUrl)[1]
-
-        self.progressDialog.setMaximum(100)
-        self.progressDialog.setTitle(f"Update ModLoader to '{version}'")
-        self.progressDialog.setContent(f"Download '{fileName}'")
-        self.progressDialog.show()
-        urllib.request.urlretrieve(fileUrl, filePath, self.handleUpdateApp)
-        self.progressDialog.hide()
-
-        subprocess.Popen([os.environ["CLIENT_PATH"], "-update",
-                         os.path.abspath(sys.argv[0]),
-                         filePath])
-        QApplication.exit(0)
+        return None
 
     def checkNewVersion(self):
         latest = GetLatest()
@@ -664,66 +650,7 @@ class ModLoader(QMainWindow):
             self.urlImport(url)
 
     def urlImport(self, url: str):
-        self.setForeground()
-
-        data = url.split(":", 1)[1].strip("/")
-        splitData = data.split(",")
-
-        if len(splitData) == 3:
-            tag, modId, dlId = data.split(",")
-            zipUrl = f"http://gamebanana.com/dl/{dlId}"
-        else:
-            zipUrl = ""
-            return
-
-        archivePath = os.path.join(self.modsPath, "_mod.archive")
-
-        self.progressDialog.setMaximum(100)
-        self.progressDialog.setTitle("Download mod")
-        self.progressDialog.setContent("")
-        self.progressDialog.show()
-        QApplication.processEvents()
-        try:
-            urllib.request.urlretrieve(zipUrl, archivePath, self.handleUpdateApp)
-
-            with open(archivePath, "rb") as file:
-                _signature = file.read(3)
-
-            if _signature.startswith(b"7z"):
-                with py7zr.SevenZipFile(archivePath) as mod7z:
-                    for file in mod7z.getnames():
-                        if file.endswith(f".{core.MOD_FILE_FORMAT}"):
-                            self.progressDialog.setContent(f"Extract: '{file}'")
-                            QApplication.processEvents()
-                            mod7z.extract(self.modsPath, [file])
-
-            elif _signature.startswith(b"Rar"):
-                with rarfile.RarFile(archivePath) as modRar:
-                    for file in modRar.namelist():
-                        if file.endswith(f".{core.MOD_FILE_FORMAT}"):
-                            self.progressDialog.setContent(f"Extract: '{file}'")
-                            QApplication.processEvents()
-                            modRar.extract(file, self.modsPath)
-
-            elif _signature.startswith(b"PK"):
-                with zipfile.ZipFile(archivePath) as modZip:
-                    for file in modZip.namelist():
-                        if file.endswith(f".{core.MOD_FILE_FORMAT}"):
-                            self.progressDialog.setContent(f"Extract: '{file}'")
-                            QApplication.processEvents()
-                            modZip.extract(file, self.modsPath)
-
-            self.reloadMods()
-            self.progressDialog.hide()
-
-        except rarfile.RarCannotExec:
-            self.showError("Unpack error:", "WinRar 'unrar.exe' not found")
-
-        except:
-            self.showError("Unpack error:", "".join(traceback.format_exception(*sys.exc_info())))
-
-        finally:
-            os.remove(archivePath)
+        return None
 
 
 # pyrcc5 -o ui/ui_sources/icons_rc.py ui/ui_sources/icons.qrc
@@ -746,15 +673,6 @@ def RunApp():
     font_db.addApplicationFont(":/fonts/resources/fonts/Roboto/Roboto-MediumItalic.ttf")
     font_db.addApplicationFont(":/fonts/resources/fonts/Roboto/Roboto-Regular.ttf")
 
-    """
-    translator = QTranslator()
-    lang = QLocale.system().name()
-    supportedLangs = translate.GetLangs()
-    if lang in supportedLangs:
-        translator.load(supportedLangs[lang])
-    app.installTranslator(translator)
-    """
-
     window = ModLoader()
     window.show()
 
@@ -764,3 +682,5 @@ def RunApp():
 
 if __name__ == "__main__":
     RunApp()
+
+# python -m PyInstaller main.spec
