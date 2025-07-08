@@ -1,6 +1,9 @@
 from typing import List, Dict
 import os
 import datetime
+import random
+import json
+import time
 
 from PySide6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QFrame, QLabel, QMenu
 from PySide6.QtGui import QPixmap, QPaintEvent, QIcon, QCursor, QAction
@@ -22,7 +25,7 @@ from ..utils.buttongroup import ButtonGroup
 
 
 class NavigateButton(ButtonGroup):
-    def __init__(self, n, method):
+    def __init__(self, n, method, parent=None):
         self.n = n
 
         self.previewNavigate = QPushButton()
@@ -35,7 +38,8 @@ class NavigateButton(ButtonGroup):
         self.previewNavigate.setIconSize(QSize(8, 8))
         self.previewNavigate.setCheckable(True)
 
-        super().__init__("PreviewNavigate", self.previewNavigate, method=method)
+        super().__init__(group="PreviewNavigate", button=self.previewNavigate, method=method, parent=parent)
+
 
         if self.n == 0:
             self.previewNavigate.setChecked(True)
@@ -92,6 +96,9 @@ class Mods(QWidget):
         self.ui = Ui_Mods()
         self.ui.setupUi(self)
 
+        self.timestamps_file = os.path.join(os.getcwd(), "mod_timestamps.json")
+        self.mod_timestamps = self.load_timestamps()
+
         self.preview = None
         self.previews: List[QPixmap] = []
         self.previewsNavigate: List[NavigateButton] = [NavigateButton(n, self.setPreviewNum) for n in range(6)]
@@ -140,6 +147,7 @@ class Mods(QWidget):
         self.modsActions.reinstall.clicked.connect(reinstallMethod)
         self.modsActions.deleteMod.clicked.connect(deleteMethod)
         self.ui.reloadModsList.clicked.connect(reloadMethod)
+        self.ui.reinstallAllModsButton.clicked.connect(self.reinstallAllMods)
         self.ui.openModsFolderButton.clicked.connect(openFolderMethod)
         
         # Connect sort button to menu
@@ -150,6 +158,22 @@ class Mods(QWidget):
         AddToFrame(self.body.modActions, actionsWidget)
 
         self.setPreviewsPaths([self.defaultPreview])
+
+    def load_timestamps(self):
+        if os.path.exists(self.timestamps_file):
+            try:
+                with open(self.timestamps_file, 'r') as f:
+                    return json.load(f)
+            except (IOError, json.JSONDecodeError):
+                return {}
+        return {}
+
+    def save_timestamps(self):
+        try:
+            with open(self.timestamps_file, 'w') as f:
+                json.dump(self.mod_timestamps, f, indent=4)
+        except IOError:
+            print(f"Warning: Could not save timestamps to {self.timestamps_file}")
 
     def loadPreview(self, pixmap: QPixmap):
         self.previewRatio = pixmap.width() / pixmap.height()
@@ -341,6 +365,25 @@ class Mods(QWidget):
         if not self.selectedModButton:
             modButton.select()
 
+    def reinstallAllMods(self):
+        self.window().buttonsDialog.setTitle("Reinstall All Mods")
+        self.window().buttonsDialog.setContent("Are you sure you want to reinstall all installed mods?")
+        self.window().buttonsDialog.setButtons([
+            ("Proceed", self._reinstallAllMods),
+            ("Cancel", self.window().buttonsDialog.hide)
+        ])
+        self.window().buttonsDialog.show()
+
+    def _reinstallAllMods(self):
+        self.window().buttonsDialog.hide()
+        installed_mods = [
+            mod_button.modClass
+            for mod_button in self.modsButtons
+            if mod_button.modClass.installed
+        ]
+        for mod in installed_mods:
+            self.window().reinstallMod(mod.hash)
+
     def addMod(self,
                gameVersion: str,
                name: str,
@@ -353,7 +396,10 @@ class Mods(QWidget):
                platform: str,
                installed: bool,
                currentVersion: bool,
-               modFileExist: bool):
+               modFileExist: bool,
+               modPath: str,
+               modCachePath: str,
+               dateAdded: float):
 
         for path in previewsPaths:
             self.cachePreview(path)
@@ -369,7 +415,10 @@ class Mods(QWidget):
                        platform,
                        installed,
                        currentVersion,
-                       modFileExist)
+                       modFileExist,
+                       modPath,
+                       modCachePath,
+                       dateAdded)
 
         self.mods[hash] = mod
         self.addModButton(mod)
@@ -457,23 +506,20 @@ class Mods(QWidget):
         if sortBy == self.SORT_BY_NAME:
             self.modsButtons.sort(key=lambda mb: mb.modClass.name.lower(), reverse=not ascending)
         elif sortBy == self.SORT_BY_DATE:
-            # Get the mod file path based on hash - safer than accessing a potentially missing attribute
             def get_mod_time(mod_button):
+                timestamp = mod_button.modClass.dateAdded
                 mod_hash = mod_button.modClass.hash
-                # Check if the mod exists in mods dictionary
-                if mod_hash in self.mods:
-                    # Try to find the mod file
-                    mod_files = []
-                    for root, dirs, files in os.walk(os.path.join(os.getcwd(), "Mods")):
-                        for file in files:
-                            if mod_button.modClass.modFileExist and file.endswith(".bmod"):
-                                file_path = os.path.join(root, file)
-                                try:
-                                    return os.path.getmtime(file_path)
-                                except:
-                                    pass
-                return 0  # Default value if file not found
-                                
+
+                if timestamp > 0:
+                    return timestamp
+
+                if mod_hash in self.mod_timestamps:
+                    return self.mod_timestamps[mod_hash]
+
+                new_timestamp = time.time()
+                self.mod_timestamps[mod_hash] = new_timestamp
+                self.save_timestamps()
+                return new_timestamp
             self.modsButtons.sort(key=get_mod_time, reverse=not ascending)
         elif sortBy == self.SORT_BY_SIZE:
             # Get the mod file size based on mod name and hash

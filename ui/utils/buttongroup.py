@@ -7,7 +7,9 @@ from PySide6.QtCore import QEvent
 class ButtonGroup(QWidget):
     _groups: Dict[str, list] = {}
 
-    def __init__(self, group: str, button: QPushButton, isDefault: bool = False, method=None):
+    def __init__(self, group: str, button: QPushButton, isDefault: bool = False, method=None, parent=None):
+        super().__init__(parent)
+
         self.group = group
 
         if group not in self._groups:
@@ -27,8 +29,6 @@ class ButtonGroup(QWidget):
         if isDefault:
             self.button.setChecked(True)
             self.pressedMethod()
-
-        super().__init__()
 
         self.button.installEventFilter(self)
 

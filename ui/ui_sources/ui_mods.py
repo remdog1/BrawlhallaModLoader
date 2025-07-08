@@ -1,17 +1,24 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'modsUNiHUf.ui'
+## Form generated from reading UI file 'mods.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.1.2
+## Created by: Qt User Interface Compiler version 6.9.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import *  # type: ignore
-from PySide6.QtGui import *  # type: ignore
-from PySide6.QtWidgets import *  # type: ignore
-
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLineEdit,
+    QPushButton, QScrollArea, QSizePolicy, QSplitter,
+    QVBoxLayout, QWidget)
+from . import icons_rc
 
 class Ui_Mods(object):
     def setupUi(self, Mods):
@@ -45,7 +52,7 @@ class Ui_Mods(object):
         self.searchFrame.setObjectName(u"searchFrame")
         self.searchFrame.setMinimumSize(QSize(0, 30))
         self.searchFrame.setMaximumSize(QSize(16777215, 30))
-        self.searchFrame.setCursor(QCursor(Qt.IBeamCursor))
+        self.searchFrame.setCursor(QCursor(Qt.CursorShape.IBeamCursor))
         self.searchFrame.setStyleSheet(u"background-color: #1D1E20;")
         self.searchFrame.setFrameShape(QFrame.StyledPanel)
         self.searchFrame.setFrameShadow(QFrame.Raised)
@@ -57,7 +64,7 @@ class Ui_Mods(object):
         self.searchButton.setObjectName(u"searchButton")
         self.searchButton.setMinimumSize(QSize(25, 0))
         icon = QIcon()
-        icon.addFile(u":/icons/resources/icons/Search.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(u":/icons/resources/icons/Search.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.searchButton.setIcon(icon)
         self.searchButton.setIconSize(QSize(14, 14))
 
@@ -145,7 +152,7 @@ class Ui_Mods(object):
         self.createMod = QPushButton(self.createModFrame)
         self.createMod.setObjectName(u"createMod")
         self.createMod.setMinimumSize(QSize(0, 30))
-        self.createMod.setCursor(QCursor(Qt.PointingHandCursor))
+        self.createMod.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
 
         self.verticalLayout_3.addWidget(self.createMod)
 
@@ -175,16 +182,16 @@ class Ui_Mods(object):
         self.horizontalLayout_4.setContentsMargins(0, 0, 0, 0)
         self.deleteAllMods = QPushButton(self.leftButtons)
         self.deleteAllMods.setObjectName(u"deleteAllMods")
-        sizePolicy = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Minimum)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.deleteAllMods.sizePolicy().hasHeightForWidth())
         self.deleteAllMods.setSizePolicy(sizePolicy)
         self.deleteAllMods.setMinimumSize(QSize(30, 30))
-        self.deleteAllMods.setCursor(QCursor(Qt.PointingHandCursor))
+        self.deleteAllMods.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.deleteAllMods.setStyleSheet(u"")
         icon1 = QIcon()
-        icon1.addFile(u":/icons/resources/icons/UninstallAllMods.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon1.addFile(u":/icons/resources/icons/UninstallAllMods.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.deleteAllMods.setIcon(icon1)
 
         self.horizontalLayout_4.addWidget(self.deleteAllMods)
@@ -192,9 +199,9 @@ class Ui_Mods(object):
         self.reloadModsList = QPushButton(self.leftButtons)
         self.reloadModsList.setObjectName(u"reloadModsList")
         self.reloadModsList.setMinimumSize(QSize(30, 30))
-        self.reloadModsList.setCursor(QCursor(Qt.PointingHandCursor))
+        self.reloadModsList.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         icon2 = QIcon()
-        icon2.addFile(u":/icons/resources/icons/UpdateModsTable.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon2.addFile(u":/icons/resources/icons/UpdateModsTable.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.reloadModsList.setIcon(icon2)
 
         self.horizontalLayout_4.addWidget(self.reloadModsList)
@@ -202,9 +209,9 @@ class Ui_Mods(object):
         self.installAllMods = QPushButton(self.leftButtons)
         self.installAllMods.setObjectName(u"installAllMods")
         self.installAllMods.setMinimumSize(QSize(30, 30))
-        self.installAllMods.setCursor(QCursor(Qt.PointingHandCursor))
+        self.installAllMods.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         icon3 = QIcon()
-        icon3.addFile(u":/icons/resources/icons/InstallAllMods.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon3.addFile(u":/icons/resources/icons/InstallAllMods.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.installAllMods.setIcon(icon3)
 
         self.horizontalLayout_4.addWidget(self.installAllMods)
@@ -227,29 +234,29 @@ class Ui_Mods(object):
         sizePolicy.setHeightForWidth(self.modsSortButton.sizePolicy().hasHeightForWidth())
         self.modsSortButton.setSizePolicy(sizePolicy)
         self.modsSortButton.setMinimumSize(QSize(30, 30))
-        self.modsSortButton.setCursor(QCursor(Qt.PointingHandCursor))
+        self.modsSortButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         icon4 = QIcon()
-        icon4.addFile(u":/icons/resources/icons/SortModsList.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon4.addFile(u":/icons/resources/icons/SortModsList.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.modsSortButton.setIcon(icon4)
 
         self.horizontalLayout_5.addWidget(self.modsSortButton)
 
-        self.updateAllMods = QPushButton(self.rightButtons)
-        self.updateAllMods.setObjectName(u"updateAllMods")
-        self.updateAllMods.setMinimumSize(QSize(30, 30))
-        self.updateAllMods.setCursor(QCursor(Qt.PointingHandCursor))
+        self.reinstallAllModsButton = QPushButton(self.rightButtons)
+        self.reinstallAllModsButton.setObjectName(u"reinstallAllModsButton")
+        self.reinstallAllModsButton.setMinimumSize(QSize(30, 30))
+        self.reinstallAllModsButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         icon5 = QIcon()
-        icon5.addFile(u":/icons/resources/icons/UpdateAllMods.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.updateAllMods.setIcon(icon5)
+        icon5.addFile(u":/icons/resources/icons/UpdateAllMods.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.reinstallAllModsButton.setIcon(icon5)
 
-        self.horizontalLayout_5.addWidget(self.updateAllMods)
+        self.horizontalLayout_5.addWidget(self.reinstallAllModsButton)
 
         self.openModsFolderButton = QPushButton(self.rightButtons)
         self.openModsFolderButton.setObjectName(u"openModsFolderButton")
         self.openModsFolderButton.setMinimumSize(QSize(30, 30))
-        self.openModsFolderButton.setCursor(QCursor(Qt.PointingHandCursor))
+        self.openModsFolderButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         icon6 = QIcon()
-        icon6.addFile(u":/icons/resources/icons/OpenModsFolder.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon6.addFile(u":/icons/resources/icons/OpenModsFolder.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.openModsFolderButton.setIcon(icon6)
 
         self.horizontalLayout_5.addWidget(self.openModsFolderButton)
@@ -263,7 +270,7 @@ class Ui_Mods(object):
         self.splitter.addWidget(self.modsList)
         self.modBody = QFrame(self.splitter)
         self.modBody.setObjectName(u"modBody")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Preferred)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.modBody.sizePolicy().hasHeightForWidth())
@@ -358,7 +365,10 @@ class Ui_Mods(object):
 #endif // QT_CONFIG(tooltip)
         self.installAllMods.setText("")
         self.modsSortButton.setText("")
-        self.updateAllMods.setText("")
+#if QT_CONFIG(tooltip)
+        self.reinstallAllModsButton.setToolTip(QCoreApplication.translate("Mods", u"<html><head/><body><p><span style=\" color:#eeeeee;\">Reinstall all mods</span></p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.reinstallAllModsButton.setText("")
         self.openModsFolderButton.setText("")
     # retranslateUi
 

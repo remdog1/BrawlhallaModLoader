@@ -1,17 +1,23 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-## Form generated from reading UI file 'mods_actionsnWYaPk.ui'
+## Form generated from reading UI file 'mods_actions.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.1.2
+## Created by: Qt User Interface Compiler version 6.9.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import *  # type: ignore
-from PySide6.QtGui import *  # type: ignore
-from PySide6.QtWidgets import *  # type: ignore
-
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QPushButton,
+    QSizePolicy, QWidget)
+from . import icons_rc
 
 class Ui_ModsActions(object):
     def setupUi(self, ModsActions):
@@ -20,7 +26,7 @@ class Ui_ModsActions(object):
         ModsActions.resize(748, 40)
         ModsActions.setMinimumSize(QSize(0, 40))
         ModsActions.setMaximumSize(QSize(16777215, 40))
-        ModsActions.setCursor(QCursor(Qt.ArrowCursor))
+        ModsActions.setCursor(QCursor(Qt.CursorShape.ArrowCursor))
         ModsActions.setStyleSheet(u"border: none;")
         self.horizontalLayout = QHBoxLayout(ModsActions)
         self.horizontalLayout.setSpacing(0)
@@ -41,12 +47,12 @@ class Ui_ModsActions(object):
         font.setFamilies([u"Roboto Medium"])
         font.setPointSize(11)
         self.webPage.setFont(font)
-        self.webPage.setCursor(QCursor(Qt.PointingHandCursor))
+        self.webPage.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.webPage.setStyleSheet(u"background-color: #3396CD;\n"
 "border-radius: 4px;\n"
 "color: #eeeeee;")
         icon = QIcon()
-        icon.addFile(u":/icons/resources/icons/OpenWeb.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(u":/icons/resources/icons/OpenWeb.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.webPage.setIcon(icon)
         self.webPage.setIconSize(QSize(22, 22))
 
@@ -56,12 +62,12 @@ class Ui_ModsActions(object):
         self.install.setObjectName(u"install")
         self.install.setMinimumSize(QSize(90, 40))
         self.install.setFont(font)
-        self.install.setCursor(QCursor(Qt.PointingHandCursor))
+        self.install.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.install.setStyleSheet(u"background-color: #43C15F;\n"
 "border-radius: 4px;\n"
 "color: #eeeeee;")
         icon1 = QIcon()
-        icon1.addFile(u":/icons/resources/icons/Install.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon1.addFile(u":/icons/resources/icons/Install.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.install.setIcon(icon1)
         self.install.setIconSize(QSize(22, 22))
 
@@ -71,12 +77,12 @@ class Ui_ModsActions(object):
         self.uninstall.setObjectName(u"uninstall")
         self.uninstall.setMinimumSize(QSize(90, 40))
         self.uninstall.setFont(font)
-        self.uninstall.setCursor(QCursor(Qt.PointingHandCursor))
+        self.uninstall.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.uninstall.setStyleSheet(u"background-color: #00B9A3;\n"
 "border-radius: 4px;\n"
 "color: #eeeeee;")
         icon2 = QIcon()
-        icon2.addFile(u":/icons/resources/icons/Uninstall.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon2.addFile(u":/icons/resources/icons/Uninstall.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.uninstall.setIcon(icon2)
         self.uninstall.setIconSize(QSize(22, 22))
 
@@ -86,12 +92,12 @@ class Ui_ModsActions(object):
         self.reinstall.setObjectName(u"reinstall")
         self.reinstall.setMinimumSize(QSize(90, 40))
         self.reinstall.setFont(font)
-        self.reinstall.setCursor(QCursor(Qt.PointingHandCursor))
+        self.reinstall.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.reinstall.setStyleSheet(u"background-color: #CD33C7;\n"
 "border-radius: 4px;\n"
 "color: #eeeeee;")
         icon3 = QIcon()
-        icon3.addFile(u":/icons/resources/icons/UpdateModsTable.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon3.addFile(u":/icons/resources/icons/UpdateModsTable.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.reinstall.setIcon(icon3)
         self.reinstall.setIconSize(QSize(22, 22))
 
@@ -101,12 +107,12 @@ class Ui_ModsActions(object):
         self.update.setObjectName(u"update")
         self.update.setMinimumSize(QSize(90, 40))
         self.update.setFont(font)
-        self.update.setCursor(QCursor(Qt.PointingHandCursor))
+        self.update.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.update.setStyleSheet(u"background-color: #833DBB;\n"
 "border-radius: 4px;\n"
 "color: #eeeeee;")
         icon4 = QIcon()
-        icon4.addFile(u":/icons/resources/icons/Update.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon4.addFile(u":/icons/resources/icons/Update.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.update.setIcon(icon4)
         self.update.setIconSize(QSize(22, 22))
 
@@ -116,12 +122,12 @@ class Ui_ModsActions(object):
         self.deleteMod.setObjectName(u"deleteMod")
         self.deleteMod.setMinimumSize(QSize(90, 40))
         self.deleteMod.setFont(font)
-        self.deleteMod.setCursor(QCursor(Qt.PointingHandCursor))
+        self.deleteMod.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.deleteMod.setStyleSheet(u"background-color: #FF5050;\n"
 "border-radius: 4px;\n"
 "color: #eeeeee;")
         icon5 = QIcon()
-        icon5.addFile(u":/icons/resources/icons/Delete.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon5.addFile(u":/icons/resources/icons/Delete.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
         self.deleteMod.setIcon(icon5)
         self.deleteMod.setIconSize(QSize(22, 22))
 
