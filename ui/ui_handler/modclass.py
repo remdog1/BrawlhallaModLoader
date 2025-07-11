@@ -16,7 +16,10 @@ class ModClass:
                  platform: str,
                  installed: bool,
                  currentVersion: bool,
-                 modFileExist: bool
+                 modFileExist: bool,
+                 modPath: str,
+                 modCachePath: str,
+                 dateAdded: float
                  ):
         self.gameVersion = gameVersion
         self.name = name
@@ -30,3 +33,6 @@ class ModClass:
         self.installed = installed
         self.currentVersion = currentVersion
         self.modFileExist = modFileExist
+        self.modPath = modPath
+        self.modCachePath = modCachePath
+        self.dateAdded = dateAdded
