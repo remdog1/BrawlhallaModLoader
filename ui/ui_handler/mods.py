@@ -1,13 +1,8 @@
 from typing import List, Dict
-import os
-import datetime
-import random
-import json
-import time
 
-from PySide6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QFrame, QLabel, QMenu
-from PySide6.QtGui import QPixmap, QPaintEvent, QIcon, QCursor, QAction
-from PySide6.QtCore import QSize, Qt, QPoint
+from PySide6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QFrame, QLabel
+from PySide6.QtGui import QPixmap, QPaintEvent, QIcon, QCursor
+from PySide6.QtCore import QSize, Qt
 
 from .modbutton import ModButton
 from .modclass import ModClass
@@ -25,7 +20,7 @@ from ..utils.buttongroup import ButtonGroup
 
 
 class NavigateButton(ButtonGroup):
-    def __init__(self, n, method, parent=None):
+    def __init__(self, n, method):
         self.n = n
 
         self.previewNavigate = QPushButton()
@@ -38,8 +33,7 @@ class NavigateButton(ButtonGroup):
         self.previewNavigate.setIconSize(QSize(8, 8))
         self.previewNavigate.setCheckable(True)
 
-        super().__init__(group="PreviewNavigate", button=self.previewNavigate, method=method, parent=parent)
-
+        super().__init__("PreviewNavigate", self.previewNavigate, method=method)
 
         if self.n == 0:
             self.previewNavigate.setChecked(True)
@@ -82,22 +76,12 @@ class Mods(QWidget):
     selectedModButton: ModButton = None
     mods: Dict[str, ModClass] = {}
     modsButtons: List[ModButton] = []
-    
-    # Variables to track sorting state
-    SORT_BY_NAME = "name"
-    SORT_BY_DATE = "date"
-    SORT_BY_SIZE = "size"
-    sortBy = SORT_BY_NAME
-    sortAscending = True
 
     def __init__(self, installMethod, uninstallMethod, reinstallMethod, deleteMethod, reloadMethod, openFolderMethod):
         super().__init__()
 
         self.ui = Ui_Mods()
         self.ui.setupUi(self)
-
-        self.timestamps_file = os.path.join(os.getcwd(), "mod_timestamps.json")
-        self.mod_timestamps = self.load_timestamps()
 
         self.preview = None
         self.previews: List[QPixmap] = []
@@ -147,33 +131,13 @@ class Mods(QWidget):
         self.modsActions.reinstall.clicked.connect(reinstallMethod)
         self.modsActions.deleteMod.clicked.connect(deleteMethod)
         self.ui.reloadModsList.clicked.connect(reloadMethod)
-        self.ui.reinstallAllModsButton.clicked.connect(self.reinstallAllMods)
         self.ui.openModsFolderButton.clicked.connect(openFolderMethod)
-        
-        # Connect sort button to menu
-        self.ui.modsSortButton.clicked.connect(self.showSortMenu)
 
         self.ui.searchArea.textChanged.connect(self.searchEvent)
 
         AddToFrame(self.body.modActions, actionsWidget)
 
         self.setPreviewsPaths([self.defaultPreview])
-
-    def load_timestamps(self):
-        if os.path.exists(self.timestamps_file):
-            try:
-                with open(self.timestamps_file, 'r') as f:
-                    return json.load(f)
-            except (IOError, json.JSONDecodeError):
-                return {}
-        return {}
-
-    def save_timestamps(self):
-        try:
-            with open(self.timestamps_file, 'w') as f:
-                json.dump(self.mod_timestamps, f, indent=4)
-        except IOError:
-            print(f"Warning: Could not save timestamps to {self.timestamps_file}")
 
     def loadPreview(self, pixmap: QPixmap):
         self.previewRatio = pixmap.width() / pixmap.height()
@@ -183,6 +147,7 @@ class Mods(QWidget):
     def searchEvent(self, text):
         if not text:
             displayModButtons = self.modsButtons
+
         else:
             text = text.casefold()
 
@@ -200,17 +165,17 @@ class Mods(QWidget):
                 ])
             ]
 
-        # Remove all mod buttons from the UI
         for modButton in self.modsButtons:
             modButton.remove()
 
-        # Re-add the filtered mod buttons, maintaining current sort order
         for modButton in displayModButtons:
             modButton.restore(self.modsList)
-        
-        # If there's a selected mod in the filtered results, ensure it stays selected
-        if self.selectedModButton is not None and self.selectedModButton in displayModButtons:
-            self.selectedModButton.select()
+
+
+
+        #for modButton in self.modsButtons:
+        #    print(modButton.modClass.name)
+        #print(text)
 
     def onResize(self, *a):
         width = self.ui.scrollBody.width() - (7 if self.ui.scrollBody.verticalScrollBar().isVisible() else 0)
@@ -343,8 +308,8 @@ class Mods(QWidget):
 
         self.setPreviewsPaths(modClass.previewsPaths)
         self.body.modName.setText(modClass.name)
-        self.body.modSource.setText("Source: " + str(modClass.platform))
-        self.body.modVersion.setText("Version: " + str(modClass.version))
+        self.body.modSource.setText("Source: " + modClass.platform)
+        self.body.modVersion.setText("Version: " + modClass.version)
         self.body.modDescription.setText(modClass.description)
         self.body.modTags.setText("Tags: " + ", ".join(modClass.tags))
 
@@ -365,25 +330,6 @@ class Mods(QWidget):
         if not self.selectedModButton:
             modButton.select()
 
-    def reinstallAllMods(self):
-        self.window().buttonsDialog.setTitle("Reinstall All Mods")
-        self.window().buttonsDialog.setContent("Are you sure you want to reinstall all installed mods?")
-        self.window().buttonsDialog.setButtons([
-            ("Proceed", self._reinstallAllMods),
-            ("Cancel", self.window().buttonsDialog.hide)
-        ])
-        self.window().buttonsDialog.show()
-
-    def _reinstallAllMods(self):
-        self.window().buttonsDialog.hide()
-        installed_mods = [
-            mod_button.modClass
-            for mod_button in self.modsButtons
-            if mod_button.modClass.installed
-        ]
-        for mod in installed_mods:
-            self.window().reinstallMod(mod.hash)
-
     def addMod(self,
                gameVersion: str,
                name: str,
@@ -396,10 +342,7 @@ class Mods(QWidget):
                platform: str,
                installed: bool,
                currentVersion: bool,
-               modFileExist: bool,
-               modPath: str,
-               modCachePath: str,
-               dateAdded: float):
+               modFileExist: bool):
 
         for path in previewsPaths:
             self.cachePreview(path)
@@ -415,18 +358,11 @@ class Mods(QWidget):
                        platform,
                        installed,
                        currentVersion,
-                       modFileExist,
-                       modPath,
-                       modCachePath,
-                       dateAdded)
+                       modFileExist)
 
         self.mods[hash] = mod
         self.addModButton(mod)
         
-        # Apply current sort when a new mod is added
-        if len(self.modsButtons) > 1:  # Only sort if there's more than one mod
-            self.sortMods(self.sortBy, self.sortAscending)
-
     def removeAllMods(self):
         ClearFrame(self.modsList)
 
@@ -439,164 +375,3 @@ class Mods(QWidget):
         for modClass in self.mods.values():
             del modClass
         self.mods.clear()
-
-    # Add a method to show the sort menu
-    def showSortMenu(self):
-        menu = QMenu(self)
-        
-        # Apply styling to match the app's theme
-        menu.setStyleSheet("""
-            QMenu {
-                background-color: #363636;
-                color: #eeeeee;
-                border: 1px solid #767676;
-                border-radius: 3px;
-            }
-            QMenu::item {
-                padding: 5px 18px 5px 12px;
-            }
-            QMenu::item:selected {
-                background-color: #767676;
-            }
-            QMenu::separator {
-                height: 1px;
-                background: #767676;
-                margin: 4px 8px;
-            }
-        """)
-        
-        # Sort by Name
-        actionNameAZ = QAction("Name (A-Z)", self)
-        actionNameZA = QAction("Name (Z-A)", self)
-        actionNameAZ.triggered.connect(lambda: self.sortMods(self.SORT_BY_NAME, True))
-        actionNameZA.triggered.connect(lambda: self.sortMods(self.SORT_BY_NAME, False))
-        
-        # Sort by Date
-        actionDateNew = QAction("Date Added (Newest First)", self)
-        actionDateOld = QAction("Date Added (Oldest First)", self)
-        actionDateNew.triggered.connect(lambda: self.sortMods(self.SORT_BY_DATE, False))
-        actionDateOld.triggered.connect(lambda: self.sortMods(self.SORT_BY_DATE, True))
-        
-        # Sort by Size
-        actionSizeSmall = QAction("File Size (Smallest First)", self)
-        actionSizeLarge = QAction("File Size (Largest First)", self)
-        actionSizeSmall.triggered.connect(lambda: self.sortMods(self.SORT_BY_SIZE, True))
-        actionSizeLarge.triggered.connect(lambda: self.sortMods(self.SORT_BY_SIZE, False))
-        
-        # Add actions to menu
-        menu.addAction(actionNameAZ)
-        menu.addAction(actionNameZA)
-        menu.addSeparator()
-        menu.addAction(actionDateNew)
-        menu.addAction(actionDateOld)
-        menu.addSeparator()
-        menu.addAction(actionSizeSmall)
-        menu.addAction(actionSizeLarge)
-        
-        # Show menu above the button
-        pos = self.ui.modsSortButton.mapToGlobal(QPoint(0, 0))
-        menu.exec(QPoint(pos.x(), pos.y() - menu.sizeHint().height()))
-    
-    # Add method to sort mods
-    def sortMods(self, sortBy, ascending):
-        self.sortBy = sortBy
-        self.sortAscending = ascending
-        
-        # Sort the modsButtons list based on criteria
-        if sortBy == self.SORT_BY_NAME:
-            self.modsButtons.sort(key=lambda mb: mb.modClass.name.lower(), reverse=not ascending)
-        elif sortBy == self.SORT_BY_DATE:
-            def get_mod_time(mod_button):
-                timestamp = mod_button.modClass.dateAdded
-                mod_hash = mod_button.modClass.hash
-
-                if timestamp > 0:
-                    return timestamp
-
-                if mod_hash in self.mod_timestamps:
-                    return self.mod_timestamps[mod_hash]
-
-                new_timestamp = time.time()
-                self.mod_timestamps[mod_hash] = new_timestamp
-                self.save_timestamps()
-                return new_timestamp
-            self.modsButtons.sort(key=get_mod_time, reverse=not ascending)
-        elif sortBy == self.SORT_BY_SIZE:
-            # Get the mod file size based on mod name and hash
-            def get_mod_size(mod_button):
-                try:
-                    # Skip if mod doesn't have a file
-                    if not mod_button.modClass.modFileExist:
-                        return 0
-                    
-                    mod_name = mod_button.modClass.name
-                    mod_hash = mod_button.modClass.hash
-                    mods_dir = os.path.join(os.getcwd(), "Mods")
-                    
-                    # First try: direct match with hash in filename
-                    for root, _, files in os.walk(mods_dir):
-                        for file in files:
-                            if file.endswith(".bmod") and mod_hash in file:
-                                file_path = os.path.join(root, file)
-                                return os.path.getsize(file_path)
-                    
-                    # Second try: match with sanitized mod name
-                    # Remove special characters from mod name for filename comparison
-                    sanitized_name = ''.join(c for c in mod_name if c.isalnum() or c in ' -_').strip()
-                    sanitized_name = sanitized_name.lower().replace(' ', '')
-                    
-                    for root, _, files in os.walk(mods_dir):
-                        for file in files:
-                            if not file.endswith(".bmod"):
-                                continue
-                                
-                            file_name = os.path.splitext(file)[0].lower()
-                            file_name = ''.join(c for c in file_name if c.isalnum()).strip()
-                            
-                            if sanitized_name and sanitized_name in file_name:
-                                file_path = os.path.join(root, file)
-                                return os.path.getsize(file_path)
-                    
-                    # Third try: if we have only one mod file and one mod, use that
-                    if len(self.mods) == 1:
-                        for root, _, files in os.walk(mods_dir):
-                            for file in files:
-                                if file.endswith(".bmod"):
-                                    file_path = os.path.join(root, file)
-                                    return os.path.getsize(file_path)
-                    
-                    # Last resort: check each subdirectory with the mod name
-                    for root, dirs, _ in os.walk(mods_dir):
-                        for dir_name in dirs:
-                            if sanitized_name and sanitized_name in dir_name.lower().replace(' ', ''):
-                                dir_path = os.path.join(root, dir_name)
-                                # Get total size of all files in this directory
-                                total_size = 0
-                                for sub_root, _, files in os.walk(dir_path):
-                                    for file in files:
-                                        try:
-                                            file_path = os.path.join(sub_root, file)
-                                            total_size += os.path.getsize(file_path)
-                                        except (IOError, OSError):
-                                            continue
-                                return total_size
-                
-                except Exception as e:
-                    print(f"Error getting size for mod {mod_button.modClass.name}: {str(e)}")
-                    return 0
-                
-                return 0  # Default if no matching file found
-                            
-            self.modsButtons.sort(key=get_mod_size, reverse=not ascending)
-        
-        # Remove all mod buttons from the UI
-        for modButton in self.modsButtons:
-            modButton.remove()
-        
-        # Re-add mod buttons in sorted order
-        for modButton in self.modsButtons:
-            modButton.restore(self.modsList)
-        
-        # If a mod was selected, make sure it stays selected
-        if self.selectedModButton is not None:
-            self.selectedModButton.select()

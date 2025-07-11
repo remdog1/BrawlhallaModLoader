@@ -1,15 +1,36 @@
 import os
-import shutil
 import sys
+import json
+import socket
+import hashlib
 import traceback
 import threading
 import multiprocessing
-import zipfile
+
+ERROR = None
+try:
+    import core
+except ImportError as e:
+    # Java not found error
+    core = None
+
+    # If other error
+    if e.msg != "Java not found!":
+        ERROR = sys.exc_info()
+
+from client import Arguments, Commands, CONFIG_FILE, CONFIG, SOCKET_PORT, MODLOADER_CLIENT
 
 from ui.utils.systemdialog import Error
 
+FROZEN = getattr(sys, 'frozen', False)
 
-os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
+MOD_FILE_FORMAT = core.MOD_FILE_FORMAT if core is not None else ""
+FILE_DESCRIPTION = "Brawlhalla Mod"
+FILE_ICON = "file_icon.ico"
+
+if core is not None:
+    os.environ["CLIENT_PATH"] = os.path.join(core.MODLOADER_CACHE_PATH, MODLOADER_CLIENT)
+    os.environ["FILE_ICON"] = os.path.join(core.MODLOADER_CACHE_PATH, FILE_ICON)
 
 
 def _bootstrap(self, parent_sentinel=None):
@@ -76,31 +97,250 @@ def handle_exception(exc_type, exc_value, exc_traceback):
 
     from main import ModLoader, PROGRAM_NAME, TerminateApp
     if ModLoader.app is not None:
-        ModLoader.app.showError("Fatal Error:",
-                                 errorText,
-                                 terminate=True)
+        ModLoader.app.showError("Fatal Error:", errorText, terminate=True)
     else:
         Error(PROGRAM_NAME, errorText)
         TerminateApp()
-        #sys.__excepthook__(exc_type, exc_value, exc_traceback)
 
 
 sys.excepthook = handle_exception
 threading.excepthook = lambda hook: handle_exception(hook.exc_type, hook.exc_value, hook.exc_traceback)
 
+if ERROR is not None:
+    sys.excepthook(ERROR)
+
+
+def GetLocalPath():
+    if FROZEN:
+        base_path = sys._MEIPASS
+    else:
+        base_path = os.path.abspath(".")
+
+    return base_path
+
+
+def InstallClient():
+    configPath = os.path.join(core.MODLOADER_CACHE_PATH, CONFIG_FILE)
+    if os.path.exists(configPath):
+        with open(configPath, "r") as file:
+            config = json.loads(file.read())
+    else:
+        config = CONFIG
+
+    clientPath = os.path.join(core.MODLOADER_CACHE_PATH, MODLOADER_CLIENT)
+
+    if FROZEN:
+        origClientPath = os.path.join(GetLocalPath(), MODLOADER_CLIENT)
+    else:
+        origClientPath = os.path.join("dist", MODLOADER_CLIENT)
+
+    with open(origClientPath, "rb") as file:
+        originalClientContent = file.read()
+        clientHash = hashlib.sha256(originalClientContent).hexdigest()
+
+    if config["clientHash"] != clientHash:
+        with open(clientPath, "wb") as file:
+            file.write(originalClientContent)
+
+    config["clientHash"] = clientHash
+    if FROZEN and sys.argv[0] != config["modLoaderPath"]:
+        config["modLoaderPath"] = sys.argv[0]
+    with open(configPath, "w") as file:
+        file.write(json.dumps(config))
+
+    iconPath = os.path.join(core.MODLOADER_CACHE_PATH, FILE_ICON)
+    if not os.path.exists(iconPath):
+        with open(iconPath, "wb") as icon:
+            with open(os.path.join(GetLocalPath(), FILE_ICON), "rb") as file:
+                icon.write(file.read())
+
+
+def RunAsAdmin():
+    import win32com.shell.shell
+
+    if sys.argv[0].endswith(".exe"):
+        argv = sys.argv[1:]
+    else:
+        argv = sys.argv
+
+    params = ' '.join([*argv, Arguments.AS_ADMIN])
+    win32com.shell.shell.ShellExecuteEx(lpVerb='runas', lpFile=sys.executable, lpParameters=params)
+    sys.exit(0)
+
+
+# File association
+def CheckFileRegistry():
+    import winreg
+    try:
+        _format = f"file{MOD_FILE_FORMAT}"
+        fileformat = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, f".{MOD_FILE_FORMAT}")
+        shell_open_command = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, f"{_format}\shell\open\command")
+        if (
+                winreg.QueryValueEx(fileformat, None)[0] != _format
+                or
+                winreg.QueryValueEx(shell_open_command, None)[0] !=
+                f"{os.path.join(core.MODLOADER_CACHE_PATH, MODLOADER_CLIENT)} {Arguments.FILE} \"%1\""
+        ):
+            winreg.CloseKey(shell_open_command)
+            winreg.CloseKey(fileformat)
+            return False
+
+        winreg.CloseKey(shell_open_command)
+        winreg.CloseKey(fileformat)
+        return True
+    except FileNotFoundError:
+        return False
+
+
+def InstallFileRegistry():
+    import winreg
+    _format = f"file{MOD_FILE_FORMAT}"
+    fileformat = winreg.CreateKey(winreg.HKEY_CLASSES_ROOT, f".{MOD_FILE_FORMAT}")
+    winreg.SetValueEx(fileformat, None, 0, winreg.REG_SZ, _format)
+
+    winreg.CreateKey(winreg.HKEY_CLASSES_ROOT, _format)
+
+    main = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, _format, 0, winreg.KEY_WRITE)
+    winreg.SetValueEx(main, None, 0, winreg.REG_SZ, FILE_DESCRIPTION)
+
+    default_icon = winreg.CreateKey(winreg.HKEY_CLASSES_ROOT, f"{_format}\DefaultIcon")
+    winreg.SetValueEx(default_icon, None, 0, winreg.REG_EXPAND_SZ,
+                      f'"{os.environ["FILE_ICON"]}",0')
+
+    shell = winreg.CreateKey(winreg.HKEY_CLASSES_ROOT, f"{_format}\shell")
+    shell_open = winreg.CreateKey(winreg.HKEY_CLASSES_ROOT, f"{_format}\shell\open")
+    shell_open_command = winreg.CreateKey(winreg.HKEY_CLASSES_ROOT, f"{_format}\shell\open\command")
+    winreg.SetValueEx(shell_open_command, None, 0, winreg.REG_SZ,
+                      f"{os.path.join(core.MODLOADER_CACHE_PATH, MODLOADER_CLIENT)} {Arguments.FILE} \"%1\""
+)
+
+    winreg.CloseKey(fileformat)
+    winreg.CloseKey(main)
+    winreg.CloseKey(default_icon)
+    winreg.CloseKey(shell)
+    winreg.CloseKey(shell_open)
+    winreg.CloseKey(shell_open_command)
+
+
+# Url association
+def CheckUrlRegistry():
+    import winreg
+    try:
+        shell_open_command = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, f"{MOD_FILE_FORMAT}\shell\open\command")
+
+        if winreg.QueryValueEx(shell_open_command, None)[0] !=
+                f"{os.path.join(core.MODLOADER_CACHE_PATH, MODLOADER_CLIENT)} {Arguments.URL} \"%1\"":
+            winreg.CloseKey(shell_open_command)
+            return False
+
+        winreg.CloseKey(shell_open_command)
+        return True
+    except FileNotFoundError:
+        return False
+
+
+def InstallUrlRegistry():
+    import winreg
+    winreg.CreateKey(winreg.HKEY_CLASSES_ROOT, MOD_FILE_FORMAT)
+
+    main = winreg.OpenKey(winreg.HKEY_CLASSES_ROOT, MOD_FILE_FORMAT, 0, winreg.KEY_WRITE)
+    winreg.SetValueEx(main, None, 0, winreg.REG_SZ, f"URL:{MOD_FILE_FORMAT} Protocol")
+    winreg.SetValueEx(main, "URL Protocol", 0, winreg.REG_SZ, "")
+
+    default_icon = winreg.CreateKey(winreg.HKEY_CLASSES_ROOT, f"{MOD_FILE_FORMAT}\DefaultIcon")
+    winreg.SetValueEx(default_icon, None, 0, winreg.REG_SZ, f'"{os.environ["FILE_ICON"]}",0')
+
+    shell = winreg.CreateKey(winreg.HKEY_CLASSES_ROOT, f"{MOD_FILE_FORMAT}\shell")
+    shell_open = winreg.CreateKey(winreg.HKEY_CLASSES_ROOT, f"{MOD_FILE_FORMAT}\shell\open")
+    shell_open_command = winreg.CreateKey(winreg.HKEY_CLASSES_ROOT, f"{MOD_FILE_FORMAT}\shell\open\command")
+    winreg.SetValueEx(shell_open_command, None, 0, winreg.REG_SZ,
+                      f"{os.path.join(core.MODLOADER_CACHE_PATH, MODLOADER_CLIENT)} {Arguments.URL} \"%1\""
+)
+
+    winreg.CloseKey(main)
+    winreg.CloseKey(default_icon)
+    winreg.CloseKey(shell)
+    winreg.CloseKey(shell_open)
+    winreg.CloseKey(shell_open_command)
+
+
+# Server for ModloaderClient.exe
+def MLServer(mlserver: socket, app):
+    def handle(_mlclient: socket, app):
+        data = _mlclient.recv(3)
+        command = data[:1]
+        size = int.from_bytes(data[1:], "big")
+        if command == Commands.NONE:
+            pass
+        elif command == Commands.JUST_OPEN:
+            app.app.setForeground()
+        elif command == Commands.OPEN_FILE:
+            file = _mlclient.recv(size).decode("UTF-8")
+            if file.endswith(MOD_FILE_FORMAT):
+                print(file)
+                app.importQueue.addFile(file)
+        elif command == Commands.OPEN_URL:
+            url = _mlclient.recv(size).decode("UTF-8")
+            app.importQueue.addUrl(url)
+        _mlclient.send(b"\x01")
+        _mlclient.close()
+
+    while True:
+        try:
+            mlclient, _ = mlserver.accept()
+            threading.Thread(target=handle, args=(mlclient, app), daemon=True).start()
+        except OSError:
+            break
+
 
 if __name__ == "__main__" and "--multiprocessing-fork" not in sys.argv:
-    if len(sys.argv) > 1:
-        dest = os.path.join(os.path.dirname(sys.argv[0]), "Mods", os.path.basename(sys.argv[1]))
-        os.makedirs(os.path.dirname(dest), exist_ok=True)
-        if os.path.splitext(sys.argv[1])[1] == ".zip":
-            with zipfile.ZipFile(os.path.abspath(sys.argv[1]), 'r') as zip_ref:
-                zip_ref.extractall(dest)
-        else:
-            shutil.copy(os.path.abspath(sys.argv[1]), dest)
-    from main import RunApp
-    RunApp()
+    os.chdir(os.path.split(sys.argv[0])[0])
+
+    if core is None:
+        from main import RunApp
+
+        RunApp()
+
+    import argparse
+
+    parser = argparse.ArgumentParser()
+    parser.add_argument(Arguments.AS_ADMIN, dest='asadmin', action='store_const', const=True, default=False)
+    args = parser.parse_args()
+
+    if sys.platform.startswith("win"):
+        InstallClient()
+        fileRegistered = CheckFileRegistry()
+        urlRegistered = CheckUrlRegistry()
+
+        if not fileRegistered or not urlRegistered:
+            if args.asadmin:
+                if not fileRegistered:
+                    InstallFileRegistry()
+
+                if not urlRegistered:
+                    InstallUrlRegistry()
+
+            elif FROZEN:
+                RunAsAdmin()
+    try:
+        mlclient = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        mlclient.settimeout(0.1)
+        mlclient.connect(("127.0.0.1", SOCKET_PORT))
+        dataSize = 0
+        mlclient.send(Commands.JUST_OPEN + dataSize.to_bytes(2, byteorder='big'))
+        mlclient.close()
+    except (ConnectionRefusedError, socket.timeout):
+        mlclient.close()
+
+        mlserver = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        mlserver.bind(('', SOCKET_PORT))
+        mlserver.listen(5)
+        from main import ModLoader, RunApp
+
+        threading.Thread(target=MLServer, args=(mlserver, ModLoader), daemon=True).start()
+        RunApp()
 
 elif "--multiprocessing-fork" in sys.argv:
     from core import Controller
+
     Controller()

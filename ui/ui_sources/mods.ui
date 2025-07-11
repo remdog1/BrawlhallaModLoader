@@ -528,7 +528,7 @@ border-radius: 5px;</string>
               </widget>
              </item>
              <item>
-              <widget class="QPushButton" name="reinstallAllModsButton">
+              <widget class="QPushButton" name="updateAllMods">
                <property name="minimumSize">
                 <size>
                  <width>30</width>
@@ -537,9 +537,6 @@ border-radius: 5px;</string>
                </property>
                <property name="cursor">
                 <cursorShape>PointingHandCursor</cursorShape>
-               </property>
-               <property name="toolTip">
-                <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#eeeeee;&quot;&gt;Reinstall all mods&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
                </property>
                <property name="text">
                 <string/>
