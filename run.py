@@ -98,5 +98,5 @@ if __name__ == "__main__" and "--multiprocessing-fork" not in sys.argv:
     RunApp()
 
 elif "--multiprocessing-fork" in sys.argv:
-    from core import Controller
+    from BhModLoaderCore.core import Controller
     Controller()

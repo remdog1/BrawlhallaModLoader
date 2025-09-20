@@ -28,9 +28,9 @@ from typing import List
 
 JAVA_FOUND = False
 try:
-    import core
-    from core import NotificationType, Notification, Environment, CORE_VERSION
-    import core.ffdec
+    import BhModLoaderCore.core as core
+    from BhModLoaderCore.core import NotificationType, Notification, Environment, CORE_VERSION
+    import BhModLoaderCore.core.ffdec
     JAVA_FOUND = True
 except ImportError as e:
     NotificationType = Notification = Environment = CORE_VERSION = None
@@ -718,7 +718,7 @@ def RunApp():
     # --- End of Single Instance Logic ---
 
     if sys.platform == "win32":
-        from core.windows import check_associations, register_associations
+        from BhModLoaderCore.core.windows import check_associations, register_associations
         if not check_associations():
             register_associations()
             # Don't return here - continue with app startup
