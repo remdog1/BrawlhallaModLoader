@@ -5,22 +5,34 @@
 
 ![window](https://github.com/Farbigoz/BhModloader/blob/main/wiki/readme/window.png)
 
-## Quick Setup (Universal)
+## ⚠️ IMPORTANT: Setup Required First! ⚠️
 
-**For any machine to work with the mod loader:**
+**🚨 If you get "ModuleNotFoundError: No module named 'py7zr'" or similar errors, you MUST run the setup first!**
 
-1. **Run the setup script:**
+### Quick Setup (Universal)
+
+**For ANY machine to work with the mod loader:**
+
+1. **FIRST - Run the setup script:**
    ```bash
    python setup_universal.py
    ```
    Or on Windows: Double-click `setup.bat`
 
-2. **Start the mod loader:**
+2. **THEN - Start the mod loader:**
    ```bash
    python main.py
    ```
 
-This ensures all dependencies are installed and the mod loader works universally on any machine.
+**This setup script installs all required dependencies and ensures the mod loader works universally on any machine.**
+
+### Manual Setup (If automatic setup fails)
+
+If the automatic setup doesn't work, install dependencies manually:
+```bash
+pip install -r requirements.txt
+pip install -r core/requirements.txt
+```
 
 ## Download application
 For downloading the app, see [**latest release**](https://github.com/Farbigoz/BhModloader/releases/latest). 

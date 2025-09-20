@@ -11,15 +11,39 @@ if getattr(sys, 'frozen', False):
     os.chdir(os.path.dirname(sys.executable))
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'core')))
-import time
-import py7zr
-import zipfile
-import traceback
-import threading
-import webbrowser
-import requests
-import subprocess
-import multiprocessing
+
+# Check for missing dependencies and provide helpful error message
+try:
+    import time
+    import py7zr
+    import zipfile
+    import traceback
+    import threading
+    import webbrowser
+    import requests
+    import subprocess
+    import multiprocessing
+except ImportError as e:
+    print("=" * 60)
+    print("🚨 MISSING DEPENDENCIES ERROR 🚨")
+    print("=" * 60)
+    print(f"Error: {e}")
+    print()
+    print("SOLUTION: You must install dependencies first!")
+    print()
+    print("Run this command:")
+    print("  python setup_universal.py")
+    print()
+    print("Or on Windows, double-click: setup.bat")
+    print()
+    print("If that doesn't work, try:")
+    print("  pip install -r requirements.txt")
+    print("  pip install -r core/requirements.txt")
+    print()
+    print("See INSTALL.md for detailed instructions.")
+    print("=" * 60)
+    input("Press Enter to exit...")
+    sys.exit(1)
 
 # (https://stackoverflow.com/questions/9144724/unknown-encoding-idna-in-python-requests)
 import encodings.idna

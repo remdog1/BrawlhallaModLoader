@@ -65,3 +65,4 @@ BrawlhallaModLoader/
 ```
 
 The mod loader uses relative paths and should work on any machine when dependencies are properly installed.
+

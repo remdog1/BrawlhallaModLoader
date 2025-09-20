@@ -9,3 +9,4 @@ echo Setup complete! You can now run the mod loader with:
 echo python main.py
 echo.
 pause
+

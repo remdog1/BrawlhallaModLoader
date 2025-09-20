@@ -110,3 +110,4 @@ exe = EXE(
     entitlements_file=None,
     icon='file_icon.ico',
 )
+
