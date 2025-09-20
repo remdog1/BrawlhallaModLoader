@@ -12,38 +12,24 @@ if getattr(sys, 'frozen', False):
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'core')))
 
-# Check for missing dependencies and provide helpful error message
+# Import required modules
+import time
+import zipfile
+import traceback
+import threading
+import webbrowser
+import requests
+import subprocess
+import multiprocessing
+
+# Try to import py7zr, but don't fail if it's missing
 try:
-    import time
     import py7zr
-    import zipfile
-    import traceback
-    import threading
-    import webbrowser
-    import requests
-    import subprocess
-    import multiprocessing
-except ImportError as e:
-    print("=" * 60)
-    print("🚨 MISSING DEPENDENCIES ERROR 🚨")
-    print("=" * 60)
-    print(f"Error: {e}")
-    print()
-    print("SOLUTION: You must install dependencies first!")
-    print()
-    print("Run this command:")
-    print("  python setup_universal.py")
-    print()
-    print("Or on Windows, double-click: setup.bat")
-    print()
-    print("If that doesn't work, try:")
-    print("  pip install -r requirements.txt")
-    print("  pip install -r core/requirements.txt")
-    print()
-    print("See INSTALL.md for detailed instructions.")
-    print("=" * 60)
-    input("Press Enter to exit...")
-    sys.exit(1)
+    PY7ZR_AVAILABLE = True
+except ImportError:
+    PY7ZR_AVAILABLE = False
+    print("⚠️ Warning: py7zr not available - 7z file support disabled")
+    print("   To enable 7z support, run: pip install py7zr")
 
 # (https://stackoverflow.com/questions/9144724/unknown-encoding-idna-in-python-requests)
 import encodings.idna
@@ -699,12 +685,18 @@ class ModLoader(QMainWindow):
             with open(archivePath, "rb") as file:
                 _signature = file.read(3)
                 if _signature.startswith(b"7z"):
-                    with py7zr.SevenZipFile(archivePath) as mod7z:
-                        for file in mod7z.getnames():
-                            if file.endswith((".bmod", ".wem", ".bnk", ".bin")):
-                                self.progressDialog.setContent(f"Extract: '{file}'")
-                                QApplication.processEvents()
-                                mod7z.extract(self.modsPath, [file])
+                    if PY7ZR_AVAILABLE:
+                        with py7zr.SevenZipFile(archivePath) as mod7z:
+                            for file in mod7z.getnames():
+                                if file.endswith((".bmod", ".wem", ".bnk", ".bin")):
+                                    self.progressDialog.setContent(f"Extract: '{file}'")
+                                    QApplication.processEvents()
+                                    mod7z.extract(self.modsPath, [file])
+                    else:
+                        self.progressDialog.setContent("7z files not supported - py7zr not installed")
+                        QApplication.processEvents()
+                        print("⚠️ Cannot extract 7z file - py7zr not available")
+                        print("   Install with: pip install py7zr")
                 elif _signature.startswith(b"Rar"):
                     with rarfile.RarFile(archivePath) as modRar:
                         for file in modRar.namelist():
