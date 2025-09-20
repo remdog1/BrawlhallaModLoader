@@ -15,7 +15,7 @@ if sys.platform.startswith("win"):
     import win32api
 
     def GetFileProperties(executable):
-        props = {"FileVersion": None, "FileFlags": None}
+        props = {"FileVersion": "0.3.0", "FileFlags": 0, "ProductVersion": "0.3.0"}
 
         try:
             fixedInfo = win32api.GetFileVersionInfo(executable, '\\')
@@ -34,9 +34,9 @@ if sys.platform.startswith("win"):
 
     if getattr(sys, 'frozen', False):
         fileProperties = GetFileProperties(sys.executable)
-        VERSION = fileProperties["ProductVersion"]
-        GIT_VERSION = fileProperties["FileVersion"]
-        PRERELEASE = bool(fileProperties["FileFlags"] & 0x2)
+        VERSION = fileProperties.get("ProductVersion", "0.3.0")
+        GIT_VERSION = fileProperties.get("FileVersion", "0.3.0")
+        PRERELEASE = bool(fileProperties.get("FileFlags", 0) & 0x2)
 
 else:
     def GetFileProperties(executable):
@@ -46,9 +46,9 @@ else:
 
     if getattr(sys, 'frozen', False):
         fileProperties = GetFileProperties(sys.executable)
-        VERSION = fileProperties["ProductVersion"]
-        GIT_VERSION = fileProperties["FileVersion"]
-        PRERELEASE = fileProperties["FileFlags"]
+        VERSION = fileProperties.get("ProductVersion", "0.3.0")
+        GIT_VERSION = fileProperties.get("FileVersion", "0.3.0")
+        PRERELEASE = bool(fileProperties.get("FileFlags", 0))
 
 
 def GetDownloadUrl(assets):

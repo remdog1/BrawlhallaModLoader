@@ -308,18 +308,19 @@ class Mods(QWidget):
         if not paths:
             paths = [self.defaultPreview]
 
-        if len(paths) == 1:
-            self.body.leftPreview.setMaximumWidth(0)
-            self.body.rightPreview.setMaximumWidth(0)
+        if len(paths) <= 1:
+            self.body.leftPreview.hide()
+            self.body.rightPreview.hide()
         else:
-            self.body.leftPreview.setMaximumWidth(30)
-            self.body.rightPreview.setMaximumWidth(30)
+            self.body.leftPreview.show()
+            self.body.rightPreview.show()
 
         for n, path in enumerate(paths):
             pixmap = self.cachePreview(path)
             self.previews.append(pixmap)
 
         self.loadPreview(self.previews[0])
+        self.setPreviewNum(0)
 
     def updateData(self):
         modClass = self.selectedModButton.modClass

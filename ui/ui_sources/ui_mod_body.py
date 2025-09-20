@@ -60,25 +60,11 @@ class Ui_ModBody(object):
         self.horizontalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.leftPreview = QPushButton(self.previewSwitcher)
         self.leftPreview.setObjectName(u"leftPreview")
-        self.leftPreview.setMaximumSize(QSize(30, 16777215))
+        self.leftPreview.setMaximumSize(QSize(48, 48))
         self.leftPreview.setCursor(QCursor(Qt.PointingHandCursor))
-        self.leftPreview.setStyleSheet(u"QPushButton {\n"
-"    qproperty-icon: url(\" \"); /* empty image */\n"
-"    qproperty-iconSize: 48px 48px; /* space for the background image */\n"
-"    background-image: url(\":/icons/resources/icons/BackTransparent.png\");\n"
-"	background-color: #00000000;\n"
-"    background-repeat: no-repeat;\n"
-"	margin-left: -10px;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-image: url(\":/icons/resources/icons/Back.png\");\n"
-"    background-repeat: no-repeat;\n"
-"}")
+        self.leftPreview.setStyleSheet(u"QPushButton { background-image: url(\":/icons/resources/icons/Back.png\"); background-color: transparent; background-repeat: no-repeat; border: none; } QPushButton:hover { background-image: url(\":/icons/resources/icons/BackHover.png\"); }")
         icon = QIcon()
         icon.addFile(u":/icons/resources/icons/Back.png", QSize(), QIcon.Normal, QIcon.Off)
-        icon.addFile(u":/icons/resources/icons/GhostInstalled.png", QSize(), QIcon.Active, QIcon.On)
-        icon.addFile(u":/icons/resources/icons/Back.png", QSize(), QIcon.Selected, QIcon.On)
         self.leftPreview.setIcon(icon)
         self.leftPreview.setIconSize(QSize(48, 48))
 
@@ -86,21 +72,9 @@ class Ui_ModBody(object):
 
         self.rightPreview = QPushButton(self.previewSwitcher)
         self.rightPreview.setObjectName(u"rightPreview")
-        self.rightPreview.setMaximumSize(QSize(30, 16777215))
+        self.rightPreview.setMaximumSize(QSize(48, 48))
         self.rightPreview.setCursor(QCursor(Qt.PointingHandCursor))
-        self.rightPreview.setStyleSheet(u"QPushButton {\n"
-"    qproperty-icon: url(\" \"); /* empty image */\n"
-"    qproperty-iconSize: 48px 48px; /* space for the background image */\n"
-"    background-image: url(\":/icons/resources/icons/ForwardTransparent.png\");\n"
-"	background-color: #00000000;\n"
-"    background-repeat: no-repeat;\n"
-"	margin-left: -10px;\n"
-"}\n"
-"\n"
-"QPushButton:hover {\n"
-"    background-image: url(\":/icons/resources/icons/Forward.png\");\n"
-"    background-repeat: no-repeat;\n"
-"}")
+        self.rightPreview.setStyleSheet(u"QPushButton { background-image: url(\":/icons/resources/icons/Forward.png\"); background-color: transparent; background-repeat: no-repeat; border: none; } QPushButton:hover { background-image: url(\":/icons/resources/icons/ForwardHover.png\"); }")
         icon1 = QIcon()
         icon1.addFile(u":/icons/resources/icons/Forward.png", QSize(), QIcon.Normal, QIcon.Off)
         self.rightPreview.setIcon(icon1)
@@ -213,7 +187,7 @@ class Ui_ModBody(object):
         font2.setBold(False)
         self.modTags.setFont(font2)
         self.modTags.setStyleSheet(u"QLabel{\n"
-"	color: #eeeeee;\n"
+"\tcolor: #eeeeee;\n"
 "}")
         self.modTags.setWordWrap(True)
 
@@ -275,4 +249,3 @@ class Ui_ModBody(object):
 "</style></head><body style=\" font-family:'Roboto Medium'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", None))
     # retranslateUi
-

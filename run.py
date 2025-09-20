@@ -1,17 +1,21 @@
 import os
-import shutil
 import sys
 import traceback
 import threading
 import multiprocessing
-import zipfile
 
 from ui.utils.systemdialog import Error
+# Show splash screen immediately
+try:
+    import pyi_splash
+    pyi_splash.update_text("Brawlhalla Mod Loader starting...   0% [░░░░░░░░░░░░░░░░░░░░]")
+except:
+    pass
 
 
 os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
 
-
+# Initialize Mods path for when Mod Loader is launched from .bmod file
 def _bootstrap(self, parent_sentinel=None):
     import itertools
     from multiprocessing.process import _ParentProcess
@@ -90,14 +94,6 @@ threading.excepthook = lambda hook: handle_exception(hook.exc_type, hook.exc_val
 
 
 if __name__ == "__main__" and "--multiprocessing-fork" not in sys.argv:
-    if len(sys.argv) > 1:
-        dest = os.path.join(os.path.dirname(sys.argv[0]), "Mods", os.path.basename(sys.argv[1]))
-        os.makedirs(os.path.dirname(dest), exist_ok=True)
-        if os.path.splitext(sys.argv[1])[1] == ".zip":
-            with zipfile.ZipFile(os.path.abspath(sys.argv[1]), 'r') as zip_ref:
-                zip_ref.extractall(dest)
-        else:
-            shutil.copy(os.path.abspath(sys.argv[1]), dest)
     from main import RunApp
     RunApp()
 

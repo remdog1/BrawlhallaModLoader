@@ -23,12 +23,35 @@ class Ui_Loading(object):
         self.loadingFrame.setObjectName("loadingFrame")
         self.verticalLayout_2 = QtWidgets.QVBoxLayout(self.loadingFrame)
         self.verticalLayout_2.setObjectName("verticalLayout_2")
+
+        self.titleLabel = QtWidgets.QLabel(self.loadingFrame)
+        font = QtGui.QFont()
+        font.setFamily("Exo 2")
+        font.setPointSize(24)
+        font.setBold(True)
+        self.titleLabel.setFont(font)
+        self.titleLabel.setStyleSheet("color: #92B7D1;")
+        self.titleLabel.setObjectName("titleLabel")
+        self.titleLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.verticalLayout_2.addWidget(self.titleLabel)
+
+        self.infoLabel = QtWidgets.QLabel(self.loadingFrame)
+        font = QtGui.QFont()
+        font.setFamily("Roboto")
+        font.setPointSize(11)
+        self.infoLabel.setFont(font)
+        self.infoLabel.setStyleSheet("color: #00FFFF;")
+        self.infoLabel.setObjectName("infoLabel")
+        self.infoLabel.setAlignment(QtCore.Qt.AlignCenter)
+        self.verticalLayout_2.addWidget(self.infoLabel)
+
         self.anim = QtWidgets.QLabel(self.loadingFrame)
         self.anim.setMinimumSize(QtCore.QSize(100, 100))
         self.anim.setText("")
         self.anim.setAlignment(QtCore.Qt.AlignCenter)
         self.anim.setObjectName("anim")
         self.verticalLayout_2.addWidget(self.anim)
+
         self.label = QtWidgets.QLabel(self.loadingFrame)
         font = QtGui.QFont()
         font.setFamily("Roboto")
@@ -45,4 +68,6 @@ class Ui_Loading(object):
     def retranslateUi(self, Loading):
         _translate = QtCore.QCoreApplication.translate
         Loading.setWindowTitle(_translate("Loading", "Form"))
+        self.titleLabel.setText(_translate("Loading", "Brawlhalla Mod Loader"))
+        self.infoLabel.setText(_translate("Loading", "Source: https://github.com/Farbigoz/BhModloader\nVersion: 0.3 (beta)\nAuthor: I_FabrizioG_I\nDiscord: Modhalla"))
         self.label.setText(_translate("Loading", "Loading..."))
