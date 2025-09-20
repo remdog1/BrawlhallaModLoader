@@ -10,7 +10,7 @@ import sys
 if getattr(sys, 'frozen', False):
     os.chdir(os.path.dirname(sys.executable))
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'core')))
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'core')))
 import time
 import py7zr
 import zipfile
@@ -30,6 +30,7 @@ JAVA_FOUND = False
 try:
     import core.core as core
     from core.core import NotificationType, Notification, Environment, CORE_VERSION
+    from core.core.controller.controller import Controller
     import core.core.ffdec
     JAVA_FOUND = True
 except ImportError as e:
@@ -237,7 +238,7 @@ class ModLoader(QMainWindow):
         try:
             self.loading.setText("Loading ModLoader Core")
             InitWindowSetProgress(10)
-            self.controller = core.Controller()
+            self.controller = Controller()
             InitWindowSetProgress(25)
             self.controller.setModsPath(self.modsPath)
             InitWindowSetProgress(40)
