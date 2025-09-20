@@ -5,6 +5,23 @@
 
 ![window](https://github.com/Farbigoz/BhModloader/blob/main/wiki/readme/window.png)
 
+## Quick Setup (Universal)
+
+**For any machine to work with the mod loader:**
+
+1. **Run the setup script:**
+   ```bash
+   python setup_universal.py
+   ```
+   Or on Windows: Double-click `setup.bat`
+
+2. **Start the mod loader:**
+   ```bash
+   python main.py
+   ```
+
+This ensures all dependencies are installed and the mod loader works universally on any machine.
+
 ## Download application
 For downloading the app, see [**latest release**](https://github.com/Farbigoz/BhModloader/releases/latest). 
 Older versions and pre-releases builds are available on [**releases section**](https://github.com/Farbigoz/BhModloader/releases)

@@ -98,5 +98,6 @@ if __name__ == "__main__" and "--multiprocessing-fork" not in sys.argv:
     RunApp()
 
 elif "--multiprocessing-fork" in sys.argv:
+    sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'core')))
     from core.core import Controller
     Controller()
