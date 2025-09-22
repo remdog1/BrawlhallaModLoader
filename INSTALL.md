@@ -38,3 +38,6 @@ The Brawlhalla Mod Loader requires several Python packages that are not included
 
 ---
 **Remember: Always run the setup script before trying to run the mod loader!**
+
+
+
