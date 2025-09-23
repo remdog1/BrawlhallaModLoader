@@ -5,7 +5,7 @@ import random
 import json
 import time
 
-from PySide6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QFrame, QLabel, QMenu
+from PySide6.QtWidgets import QWidget, QPushButton, QVBoxLayout, QFrame, QLabel, QMenu, QGridLayout, QHBoxLayout
 from PySide6.QtGui import QPixmap, QPaintEvent, QIcon, QCursor, QAction
 from PySide6.QtCore import QSize, Qt, QPoint
 
@@ -89,6 +89,12 @@ class Mods(QWidget):
     SORT_BY_SIZE = "size"
     sortBy = SORT_BY_NAME
     sortAscending = True
+    
+    # Variables to track view mode
+    VIEW_LIST = "list"
+    VIEW_THUMBNAIL_TEXT = "thumbnail_text"
+    VIEW_THUMBNAIL_ONLY = "thumbnail_only"
+    currentViewMode = VIEW_LIST
 
     def __init__(self, installMethod, uninstallMethod, reinstallMethod, deleteMethod, reloadMethod, openFolderMethod):
         super().__init__()
@@ -121,11 +127,12 @@ class Mods(QWidget):
         layout.setContentsMargins(2, 5, 2, 5)
         self.modsList = QFrame()
         self.modsList.setMaximumWidth(self.ui.modsList.maximumWidth())
-        layout2 = QVBoxLayout(self.modsList)
-        layout2.setSpacing(1)
-        layout2.setContentsMargins(0, 0, 0, 0)
+        # Initial layout will be set by setupListView()
         layout.addWidget(self.modsList, 0, Qt.AlignTop)
         self.ui.scrollModsList.setWidget(modsListFrame)
+        
+        # Setup initial view mode
+        self.setupListView()
 
         self.resizeEvent = self.onResize
         self.origScrollModsListResizeEvent = self.ui.scrollModsList.resizeEvent
@@ -152,6 +159,9 @@ class Mods(QWidget):
         
         # Connect sort button to menu
         self.ui.modsSortButton.clicked.connect(self.showSortMenu)
+        
+        # Connect view toggle button
+        self.ui.viewToggleButton.clicked.connect(self.toggleViewMode)
 
         self.ui.searchArea.textChanged.connect(self.searchEvent)
 
@@ -361,7 +371,13 @@ class Mods(QWidget):
                               method=self.selectMod)
 
         self.modsButtons.append(modButton)
-        AddToFrame(self.modsList, modButton)
+        
+        # Add to current view mode
+        if self.currentViewMode == self.VIEW_LIST:
+            AddToFrame(self.modsList, modButton)
+        else:
+            # For other view modes, refresh the entire list
+            self.refreshModList()
 
         if not self.selectedModButton:
             modButton.select()
@@ -601,3 +617,190 @@ class Mods(QWidget):
         # If a mod was selected, make sure it stays selected
         if self.selectedModButton is not None:
             self.selectedModButton.select()
+
+    def toggleViewMode(self):
+        """Cycle through the three view modes"""
+        if self.currentViewMode == self.VIEW_LIST:
+            self.currentViewMode = self.VIEW_THUMBNAIL_TEXT
+            self.ui.viewToggleButton.setIcon(QIcon(":/icons/resources/icons/thumbnail.png"))
+        elif self.currentViewMode == self.VIEW_THUMBNAIL_TEXT:
+            self.currentViewMode = self.VIEW_THUMBNAIL_ONLY
+            self.ui.viewToggleButton.setIcon(QIcon(":/icons/resources/icons/About.png"))
+        else:  # VIEW_THUMBNAIL_ONLY
+            self.currentViewMode = self.VIEW_LIST
+            self.ui.viewToggleButton.setIcon(QIcon(":/icons/resources/icons/SortModsList.png"))
+        
+        # Refresh the mod list with the new view mode
+        self.refreshModList()
+
+    def refreshModList(self):
+        """Refresh the mod list with the current view mode"""
+        # Store current selection
+        selected_hash = None
+        if self.selectedModButton:
+            selected_hash = self.selectedModButton.modClass.hash
+        
+        # Clear current layout
+        ClearFrame(self.modsList)
+        
+        # Recreate layout based on view mode
+        if self.currentViewMode == self.VIEW_LIST:
+            self.setupListView()
+        elif self.currentViewMode == self.VIEW_THUMBNAIL_TEXT:
+            self.setupThumbnailTextView()
+        else:  # VIEW_THUMBNAIL_ONLY
+            self.setupThumbnailOnlyView()
+        
+        # Restore selection
+        if selected_hash:
+            for modButton in self.modsButtons:
+                if modButton.modClass.hash == selected_hash:
+                    modButton.select()
+                    break
+
+    def setupListView(self):
+        """Setup the traditional list view"""
+        layout = QVBoxLayout(self.modsList)
+        layout.setSpacing(1)
+        layout.setContentsMargins(0, 0, 0, 0)
+        
+        # Add all mod buttons
+        for modButton in self.modsButtons:
+            layout.addWidget(modButton)
+
+    def setupThumbnailTextView(self):
+        """Setup thumbnail + text view"""
+        layout = QVBoxLayout(self.modsList)
+        layout.setSpacing(5)
+        layout.setContentsMargins(5, 5, 5, 5)
+        
+        # Add all mod buttons with larger thumbnails
+        for modButton in self.modsButtons:
+            # Create a custom widget for thumbnail + text view
+            thumbnail_widget = self.createThumbnailTextWidget(modButton)
+            layout.addWidget(thumbnail_widget)
+
+    def setupThumbnailOnlyView(self):
+        """Setup thumbnail-only view with 2-column grid"""
+        layout = QGridLayout(self.modsList)
+        layout.setSpacing(5)
+        layout.setContentsMargins(5, 5, 5, 5)
+        
+        # Add mod buttons in 2-column grid
+        for i, modButton in enumerate(self.modsButtons):
+            row = i // 2
+            col = i % 2
+            thumbnail_widget = self.createThumbnailOnlyWidget(modButton)
+            layout.addWidget(thumbnail_widget, row, col)
+
+    def createThumbnailTextWidget(self, modButton):
+        """Create a widget for thumbnail + text view"""
+        from PySide6.QtWidgets import QFrame, QHBoxLayout, QVBoxLayout, QLabel
+        from PySide6.QtCore import Qt
+        
+        widget = QFrame()
+        widget.setStyleSheet("""
+            QFrame {
+                background-color: #2C2C2C;
+                border: 1px solid #404040;
+                border-radius: 5px;
+                padding: 5px;
+            }
+            QFrame:hover {
+                background-color: #3C3C3C;
+            }
+        """)
+        
+        layout = QHBoxLayout(widget)
+        layout.setSpacing(10)
+        
+        # Thumbnail
+        thumbnail_label = QLabel()
+        thumbnail_label.setFixedSize(80, 60)
+        thumbnail_label.setStyleSheet("border: 1px solid #555;")
+        thumbnail_label.setAlignment(Qt.AlignCenter)
+        
+        # Get first preview image
+        if modButton.modClass.previewsPaths:
+            preview_path = modButton.modClass.previewsPaths[0]
+            if preview_path in self.cachePreviews:
+                pixmap = self.cachePreviews[preview_path]
+                thumbnail_label.setPixmap(pixmap.scaled(80, 60, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            else:
+                thumbnail_label.setText("No Preview")
+        else:
+            thumbnail_label.setText("No Preview")
+        
+        layout.addWidget(thumbnail_label)
+        
+        # Text info
+        text_layout = QVBoxLayout()
+        text_layout.setSpacing(2)
+        
+        name_label = QLabel(modButton.modClass.name)
+        name_label.setStyleSheet("font-weight: bold; color: white;")
+        text_layout.addWidget(name_label)
+        
+        author_label = QLabel(f"by {modButton.modClass.author}")
+        author_label.setStyleSheet("color: #AAAAAA;")
+        text_layout.addWidget(author_label)
+        
+        version_label = QLabel(f"[{modButton.modClass.gameVersion}]")
+        if modButton.modClass.currentVersion:
+            version_label.setStyleSheet("color: #43C15F;")
+        else:
+            version_label.setStyleSheet("color: #3FAED1;")
+        text_layout.addWidget(version_label)
+        
+        layout.addLayout(text_layout)
+        layout.addStretch()
+        
+        # Make it clickable
+        widget.mousePressEvent = lambda event: modButton.select()
+        
+        return widget
+
+    def createThumbnailOnlyWidget(self, modButton):
+        """Create a widget for thumbnail-only view"""
+        from PySide6.QtWidgets import QFrame, QVBoxLayout, QLabel
+        from PySide6.QtCore import Qt
+        
+        widget = QFrame()
+        widget.setStyleSheet("""
+            QFrame {
+                background-color: #2C2C2C;
+                border: 1px solid #404040;
+                border-radius: 5px;
+                padding: 5px;
+            }
+            QFrame:hover {
+                background-color: #3C3C3C;
+            }
+        """)
+        
+        layout = QVBoxLayout(widget)
+        layout.setSpacing(5)
+        
+        # Thumbnail
+        thumbnail_label = QLabel()
+        thumbnail_label.setFixedSize(120, 90)
+        thumbnail_label.setStyleSheet("border: 1px solid #555;")
+        thumbnail_label.setAlignment(Qt.AlignCenter)
+        
+        # Get first preview image
+        if modButton.modClass.previewsPaths:
+            preview_path = modButton.modClass.previewsPaths[0]
+            if preview_path in self.cachePreviews:
+                pixmap = self.cachePreviews[preview_path]
+                thumbnail_label.setPixmap(pixmap.scaled(120, 90, Qt.KeepAspectRatio, Qt.SmoothTransformation))
+            else:
+                thumbnail_label.setText("No Preview")
+        else:
+            thumbnail_label.setText("No Preview")
+        
+        layout.addWidget(thumbnail_label)
+        
+        # Make it clickable
+        widget.mousePressEvent = lambda event: modButton.select()
+        
+        return widget

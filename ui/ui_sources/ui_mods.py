@@ -216,6 +216,16 @@ class Ui_Mods(object):
 
         self.horizontalLayout_4.addWidget(self.installAllMods)
 
+        self.viewToggleButton = QPushButton(self.leftButtons)
+        self.viewToggleButton.setObjectName(u"viewToggleButton")
+        self.viewToggleButton.setMinimumSize(QSize(30, 30))
+        self.viewToggleButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        icon4 = QIcon()
+        icon4.addFile(u":/icons/resources/icons/SortModsList.png", QSize(), QIcon.Mode.Normal, QIcon.State.Off)
+        self.viewToggleButton.setIcon(icon4)
+
+        self.horizontalLayout_4.addWidget(self.viewToggleButton)
+
 
         self.horizontalLayout_3.addWidget(self.leftButtons, 0, Qt.AlignLeft)
 
