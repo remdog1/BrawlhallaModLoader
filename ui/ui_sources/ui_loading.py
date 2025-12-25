@@ -69,5 +69,5 @@ class Ui_Loading(object):
         _translate = QtCore.QCoreApplication.translate
         Loading.setWindowTitle(_translate("Loading", "Form"))
         self.titleLabel.setText(_translate("Loading", "Brawlhalla Mod Loader"))
-        self.infoLabel.setText(_translate("Loading", "Source: https://github.com/Farbigoz/BhModloader\nVersion: 0.3 (beta)\nAuthor: I_FabrizioG_I\nDiscord: Modhalla"))
+        self.infoLabel.setText(_translate("Loading", "Source: https://github.com/remdog1/BrawlhallaModLoader\nVersion: 0.5.0 (beta)\nAuthor: I_FabrizioG_I , Bucccket , LVLONE\nDiscord: Modhalla"))
         self.label.setText(_translate("Loading", "Loading..."))

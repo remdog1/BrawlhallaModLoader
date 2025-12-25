@@ -1,11 +1,11 @@
 import re
 import sys
 
-GAMEBANANA = "https://gamebanana.com/tools/7444"
+GAMEBANANA = "https://gamebanana.com/tools/20722"
 
 GITHUB = "https://github.com"
 GITHUB_API = "https://api.github.com"
-REPO = "Farbigoz/BhModloader"
+REPO = "remdog1/BrawlhallaModLoader"
 
 VERSION = "0.0.0"
 GIT_VERSION = None

@@ -4,13 +4,16 @@ import traceback
 import threading
 import multiprocessing
 
-from ui.utils.systemdialog import Error
-# Show splash screen immediately
+# Show immediate splash screen using PyInstaller's splash if available
 try:
     import pyi_splash
-    pyi_splash.update_text("Brawlhalla Mod Loader starting...   0% [░░░░░░░░░░░░░░░░░░░░]")
+    if pyi_splash.is_alive():
+        pyi_splash.update_text("Starting Brawlhalla Mod Loader...")
 except:
     pass
+
+from ui.utils.systemdialog import Error
+# Splash screen will be shown in main.py after QApplication is created
 
 
 os.chdir(os.path.dirname(os.path.abspath(sys.argv[0])))
@@ -71,8 +74,8 @@ multiprocessing.Process._bootstrap = _bootstrap
 
 def handle_exception(exc_type, exc_value, exc_traceback):
     try:
-        import pyi_splash
-        pyi_splash.close()
+        from custom_splash import close_splash
+        close_splash()
     except:
         pass
 

@@ -434,7 +434,7 @@ QPushButton:hover {
 }</string>
         </property>
         <property name="text">
-         <string>Tags:</string>
+         <string></string>
         </property>
         <property name="wordWrap">
          <bool>true</bool>

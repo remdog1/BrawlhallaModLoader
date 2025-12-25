@@ -18,7 +18,7 @@ class Ui_ModBody(object):
         if not ModBody.objectName():
             ModBody.setObjectName(u"ModBody")
         ModBody.resize(547, 481)
-        ModBody.setStyleSheet(u"border: none;")
+        ModBody.setStyleSheet(u"border: none; background-color: transparent;")
         self.verticalLayout = QVBoxLayout(ModBody)
         self.verticalLayout.setSpacing(0)
         self.verticalLayout.setObjectName(u"verticalLayout")
@@ -100,7 +100,8 @@ class Ui_ModBody(object):
         self.modName = QLabel(self.modInfoFrame)
         self.modName.setObjectName(u"modName")
         font = QFont()
-        font.setFamilies([u"Exo 2 SemiBold"])
+        # Try different possible font family names for Eras ITC Bold
+        font.setFamilies([u"Eras ITC Bold", u"ErasITC Bold", u"Eras Bold ITC", u"Eras", u"Eras ITC"])
         font.setPointSize(24)
         font.setBold(True)
         self.modName.setFont(font)
@@ -121,7 +122,7 @@ class Ui_ModBody(object):
         self.modSource.setObjectName(u"modSource")
         font1 = QFont()
         font1.setFamilies([u"Roboto Medium"])
-        font1.setPointSize(11)
+        font1.setPointSize(9)  # Reduced from 11 to 9 for smaller subtext
         font1.setBold(False)
         self.modSource.setFont(font1)
         self.modSource.setStyleSheet(u"color: #eeeeee;")
@@ -159,27 +160,30 @@ class Ui_ModBody(object):
         self.modPreview.raise_()
         self.modPreviewInfo.raise_()
 
+        # Add the fixed thumbnail frame at the top
         self.verticalLayout.addWidget(self.modPreviewFrame)
 
-        self.modDescriptionsAndActions = QFrame(ModBody)
-        self.modDescriptionsAndActions.setObjectName(u"modDescriptionsAndActions")
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
-        sizePolicy.setHorizontalStretch(0)
-        sizePolicy.setVerticalStretch(0)
-        sizePolicy.setHeightForWidth(self.modDescriptionsAndActions.sizePolicy().hasHeightForWidth())
-        self.modDescriptionsAndActions.setSizePolicy(sizePolicy)
-        self.modDescriptionsAndActions.setMinimumSize(QSize(0, 0))
-        self.modDescriptionsAndActions.setMaximumSize(QSize(16777215, 16777215))
-        self.modDescriptionsAndActions.setStyleSheet(u"QFrame{\n"
-"}")
-        self.modDescriptionsAndActions.setFrameShape(QFrame.StyledPanel)
-        self.modDescriptionsAndActions.setFrameShadow(QFrame.Raised)
-        self.verticalLayout_13 = QVBoxLayout(self.modDescriptionsAndActions)
-        self.verticalLayout_13.setSpacing(10)
-        self.verticalLayout_13.setObjectName(u"verticalLayout_13")
-        self.verticalLayout_13.setSizeConstraint(QLayout.SetDefaultConstraint)
-        self.verticalLayout_13.setContentsMargins(15, 10, 15, -1)
-        self.modTags = QLabel(self.modDescriptionsAndActions)
+        # Create a scroll area for the bottom section
+        self.scrollArea = QScrollArea(ModBody)
+        self.scrollArea.setObjectName(u"scrollArea")
+        self.scrollArea.setStyleSheet(u"QScrollArea { background-color: transparent; border: none; }")
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollArea.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.scrollArea.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+        
+        # Create the scrollable content widget
+        self.scrollableContent = QWidget()
+        self.scrollableContent.setObjectName(u"scrollableContent")
+        self.scrollableContent.setStyleSheet(u"background-color: transparent;")
+        
+        # Set up the layout for scrollable content
+        self.scrollableLayout = QVBoxLayout(self.scrollableContent)
+        self.scrollableLayout.setSpacing(0)  # Set to 0px spacing between elements for custom control
+        self.scrollableLayout.setObjectName(u"scrollableLayout")
+        self.scrollableLayout.setContentsMargins(15, 10, 15, 15)
+        
+        # Add tags
+        self.modTags = QLabel(self.scrollableContent)
         self.modTags.setObjectName(u"modTags")
         font2 = QFont()
         font2.setFamilies([u"Roboto Medium"])
@@ -190,29 +194,48 @@ class Ui_ModBody(object):
 "\tcolor: #eeeeee;\n"
 "}")
         self.modTags.setWordWrap(True)
+        self.scrollableLayout.addWidget(self.modTags, 0, Qt.AlignTop)
 
-        self.verticalLayout_13.addWidget(self.modTags, 0, Qt.AlignTop)
-
-        self.modActions = QFrame(self.modDescriptionsAndActions)
+        # Add actions
+        self.modActions = QFrame(self.scrollableContent)
         self.modActions.setObjectName(u"modActions")
         self.modActions.setMinimumSize(QSize(40, 40))
         self.modActions.setStyleSheet(u"QFrame{\n"
+"background-color: transparent;\n"
 "}")
         self.modActions.setFrameShape(QFrame.StyledPanel)
         self.modActions.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_11 = QHBoxLayout(self.modActions)
         self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
-        self.horizontalLayout_11.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_11.setContentsMargins(0, 0, 0, 10)  # Add 10px bottom margin for spacing to features
+        self.scrollableLayout.addWidget(self.modActions, 0, Qt.AlignLeft|Qt.AlignTop)
 
-        self.verticalLayout_13.addWidget(self.modActions, 0, Qt.AlignLeft|Qt.AlignTop)
+        # Add features
+        self.modFeatures = QFrame(self.scrollableContent)
+        self.modFeatures.setObjectName(u"modFeatures")
+        self.modFeatures.setMinimumSize(QSize(40, 40))
+        self.modFeatures.setStyleSheet(u"QFrame{\n"
+"background-color: transparent;\n"
+"}")
+        self.modFeatures.setFrameShape(QFrame.StyledPanel)
+        self.modFeatures.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_12 = QVBoxLayout(self.modFeatures)
+        self.verticalLayout_12.setObjectName(u"verticalLayout_12")
+        self.verticalLayout_12.setContentsMargins(0, 10, 0, 0)  # Add 10px top margin for spacing from install buttons
+        self.scrollableLayout.addWidget(self.modFeatures, 0, Qt.AlignLeft|Qt.AlignTop)
 
-        self.modDescription = QTextBrowser(self.modDescriptionsAndActions)
+        # Add description
+        self.modDescription = QTextBrowser(self.scrollableContent)
         self.modDescription.setObjectName(u"modDescription")
         self.modDescription.setMinimumSize(QSize(0, 0))
         font3 = QFont()
         font3.setFamilies([u"Roboto Medium"])
         self.modDescription.setFont(font3)
-        self.modDescription.setStyleSheet(u"QToolTip { \n"
+        self.modDescription.setStyleSheet(u"QTextBrowser { \n"
+"                           background-color: transparent; \n"
+"                           border: none;\n"
+"}\n"
+"QToolTip { \n"
 "                           background-color: black; \n"
 "                           color: white; \n"
 "                           border: black solid 1px\n"
@@ -222,11 +245,13 @@ class Ui_ModBody(object):
         self.modDescription.setSizeAdjustPolicy(QAbstractScrollArea.AdjustIgnored)
         self.modDescription.setLineWrapMode(QTextEdit.WidgetWidth)
         self.modDescription.setOpenExternalLinks(True)
+        self.scrollableLayout.addWidget(self.modDescription, 0, Qt.AlignTop)
 
-        self.verticalLayout_13.addWidget(self.modDescription, 0, Qt.AlignTop)
-
-
-        self.verticalLayout.addWidget(self.modDescriptionsAndActions, 0, Qt.AlignTop)
+        # Set the scrollable content as the widget for the scroll area
+        self.scrollArea.setWidget(self.scrollableContent)
+        
+        # Add the scroll area to the main layout with stretch to take remaining space
+        self.verticalLayout.addWidget(self.scrollArea, 1)
 
 
         self.retranslateUi(ModBody)
@@ -239,10 +264,10 @@ class Ui_ModBody(object):
         self.leftPreview.setText("")
         self.rightPreview.setText("")
         self.modName.setText(QCoreApplication.translate("ModBody", u"Brawlhalla Modloader", None))
-        self.modSource.setText(QCoreApplication.translate("ModBody", u"Source:", None))
+        self.modSource.setText(QCoreApplication.translate("ModBody", u"Author:", None))
         self.modVersion.setText(QCoreApplication.translate("ModBody", u"Version:", None))
         self.modPreview.setText("")
-        self.modTags.setText(QCoreApplication.translate("ModBody", u"Tags:", None))
+        self.modTags.setText(QCoreApplication.translate("ModBody", u"", None))
         self.modDescription.setHtml(QCoreApplication.translate("ModBody", u"<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"

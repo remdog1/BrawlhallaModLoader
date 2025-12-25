@@ -23,8 +23,8 @@ class Ui_Header(object):
     def setupUi(self, Header):
         if not Header.objectName():
             Header.setObjectName(u"Header")
-        Header.resize(850, 40)
-        Header.setMaximumSize(QSize(16777215, 40))
+        Header.resize(850, 53)
+        Header.setMaximumSize(QSize(16777215, 53))
         Header.setStyleSheet(u"border: none;")
         self.verticalLayout_2 = QVBoxLayout(Header)
         self.verticalLayout_2.setSpacing(0)
@@ -32,7 +32,7 @@ class Ui_Header(object):
         self.verticalLayout_2.setContentsMargins(0, 0, 0, 0)
         self.buttonsFrame = QFrame(Header)
         self.buttonsFrame.setObjectName(u"buttonsFrame")
-        self.buttonsFrame.setStyleSheet(u"background-color: #121317;")
+        self.buttonsFrame.setStyleSheet(u"background-color: transparent;")
         self.buttonsFrame.setFrameShape(QFrame.StyledPanel)
         self.buttonsFrame.setFrameShadow(QFrame.Raised)
         self.horizontalLayout = QHBoxLayout(self.buttonsFrame)
@@ -58,7 +58,7 @@ class Ui_Header(object):
         self.verticalLayout.setContentsMargins(0, 0, 0, 0)
         self.modsButton = QPushButton(self.modsButtonFrame)
         self.modsButton.setObjectName(u"modsButton")
-        self.modsButton.setMinimumSize(QSize(0, 38))
+        self.modsButton.setMinimumSize(QSize(0, 51))
         font = QFont()
         font.setPointSize(12)
         font.setBold(True)
@@ -96,7 +96,7 @@ class Ui_Header(object):
         self.verticalLayout_3.setContentsMargins(0, 0, 0, 0)
         self.gamebananaButton = QPushButton(self.gamebananaButtonFrame)
         self.gamebananaButton.setObjectName(u"gamebananaButton")
-        self.gamebananaButton.setMinimumSize(QSize(0, 38))
+        self.gamebananaButton.setMinimumSize(QSize(0, 51))
         self.gamebananaButton.setFont(font)
         self.gamebananaButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.gamebananaButton.setStyleSheet(u"QPushButton {\n"
@@ -120,6 +120,40 @@ class Ui_Header(object):
 
         self.horizontalLayout_2.addWidget(self.gamebananaButtonFrame)
 
+        self.toolsButtonFrame = QFrame(self.leftButtons)
+        self.toolsButtonFrame.setObjectName(u"toolsButtonFrame")
+        self.toolsButtonFrame.setFrameShape(QFrame.StyledPanel)
+        self.toolsButtonFrame.setFrameShadow(QFrame.Raised)
+        self.verticalLayout_4 = QVBoxLayout(self.toolsButtonFrame)
+        self.verticalLayout_4.setSpacing(0)
+        self.verticalLayout_4.setObjectName(u"verticalLayout_4")
+        self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
+        self.toolsButton = QPushButton(self.toolsButtonFrame)
+        self.toolsButton.setObjectName(u"toolsButton")
+        self.toolsButton.setMinimumSize(QSize(0, 51))
+        self.toolsButton.setFont(font)
+        self.toolsButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
+        self.toolsButton.setStyleSheet(u"QPushButton {\n"
+"    color: #eeeeee;\n"
+"}")
+        self.toolsButton.setCheckable(True)
+        self.toolsButton.setChecked(False)
+
+        self.verticalLayout_4.addWidget(self.toolsButton)
+
+        self.toolsLine = QFrame(self.toolsButtonFrame)
+        self.toolsLine.setObjectName(u"toolsLine")
+        self.toolsLine.setMinimumSize(QSize(0, 2))
+        self.toolsLine.setMaximumSize(QSize(16777215, 2))
+        self.toolsLine.setStyleSheet(u"background-color: #ffffff;")
+        self.toolsLine.setFrameShape(QFrame.StyledPanel)
+        self.toolsLine.setFrameShadow(QFrame.Raised)
+        self.toolsLine.setLineWidth(0)
+
+        self.verticalLayout_4.addWidget(self.toolsLine, 0, Qt.AlignHCenter|Qt.AlignBottom)
+
+        self.horizontalLayout_2.addWidget(self.toolsButtonFrame)
+
         self.settingsButtonFrame = QFrame(self.leftButtons)
         self.settingsButtonFrame.setObjectName(u"settingsButtonFrame")
         self.settingsButtonFrame.setFrameShape(QFrame.StyledPanel)
@@ -130,7 +164,7 @@ class Ui_Header(object):
         self.verticalLayout_4.setContentsMargins(0, 0, 0, 0)
         self.settingsButton = QPushButton(self.settingsButtonFrame)
         self.settingsButton.setObjectName(u"settingsButton")
-        self.settingsButton.setMinimumSize(QSize(0, 38))
+        self.settingsButton.setMinimumSize(QSize(0, 51))
         self.settingsButton.setFont(font)
         self.settingsButton.setCursor(QCursor(Qt.CursorShape.PointingHandCursor))
         self.settingsButton.setStyleSheet(u"QPushButton {\n"

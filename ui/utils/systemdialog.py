@@ -8,7 +8,14 @@ if sys.platform in ["win32", "win64"]:
     def Error(title, message):
         win32api.MessageBox(None, message, title,
                             win32con.MB_ICONERROR | win32con.MB_OK | win32con.MB_DEFBUTTON1)
+    
+    def Info(title, message):
+        win32api.MessageBox(None, message, title,
+                            win32con.MB_ICONINFORMATION | win32con.MB_OK | win32con.MB_DEFBUTTON1)
 
 else:
     def Error(title, message):
+        pass
+    
+    def Info(title, message):
         pass

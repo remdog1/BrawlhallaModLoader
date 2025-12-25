@@ -19,7 +19,8 @@ class ModClass:
                  modFileExist: bool,
                  modPath: str,
                  modCachePath: str,
-                 dateAdded: float
+                 dateAdded: float,
+                 features: List[str] = None
                  ):
         self.gameVersion = gameVersion
         self.name = name
@@ -36,3 +37,4 @@ class ModClass:
         self.modPath = modPath
         self.modCachePath = modCachePath
         self.dateAdded = dateAdded
+        self.features = features if features is not None else []
